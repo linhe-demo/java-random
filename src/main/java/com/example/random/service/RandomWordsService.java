@@ -31,7 +31,7 @@ public class RandomWordsService {
         } else {
             data.forEach(i -> {
                 LifeResponse info = new LifeResponse();
-                info.setImgUrl(i.getImgUrl());
+                info.setImgUrl(String.format("http://150.158.82.218/images/%s", i.getImgUrl()));
                 info.setText(i.getText());
                 list.add(info);
             });
