@@ -16,11 +16,10 @@ import java.util.List;
 @RestController
 @RequestMapping(Path.PREFIX_V1)
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class RandomController {
     private final RandomWordsService randomWordsService;
 
-    @GetMapping("life/moment")
+    @PostMapping("life/moment")
     public ResponseEntity<ApiResponse<List<LifeResponse>>> randomWords(@RequestBody LifeRequest request) {
         List<LifeResponse> data = randomWordsService.getRandomWords(request);
         return ResponseEntity.ok(new ApiResponse<>(data));
