@@ -2,6 +2,8 @@ package com.example.random.service;
 
 import com.example.random.domain.entity.LifeConfig;
 import com.example.random.domain.repository.LifeConfigRepository;
+import com.example.random.interfaces.client.LogClient;
+import com.example.random.interfaces.client.vo.request.LogInfoRequest;
 import com.example.random.interfaces.controller.put.request.life.LifeRequest;
 import com.example.random.interfaces.controller.put.response.life.LifeResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RandomWordsService {
     private final LifeConfigRepository lifeConfigRepository;
+    private final LogClient logClient;
 
     public List<LifeResponse> getRandomWords(LifeRequest request) {
         List<LifeResponse> list = new ArrayList<>();
@@ -36,6 +39,11 @@ public class RandomWordsService {
                 list.add(info);
             });
         }
+        LogInfoRequest param = new LogInfoRequest();
+        param.setAction("photo");
+        param.setActionUser("java-spring-boot");
+        //记录日志
+        logClient.saveLogInfo(param);
         return list;
     }
 }
