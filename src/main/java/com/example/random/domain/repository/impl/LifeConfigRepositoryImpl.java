@@ -3,6 +3,7 @@ package com.example.random.domain.repository.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.random.domain.entity.LifeConfig;
 import com.example.random.domain.repository.LifeConfigRepository;
+import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
 import com.example.random.interfaces.mapper.LifeConfigMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -17,6 +18,12 @@ public class LifeConfigRepositoryImpl implements LifeConfigRepository {
     @Override
     public List<LifeConfig> getLifeConfigData(Integer num) {
         return lifeConfigMapper.selectList(Wrappers.<LifeConfig>lambdaQuery()
+                .eq(LifeConfig::getStatus, 2)
                 .last(String.format(" ORDER BY RAND() LIMIT %s ", num)));
+    }
+
+    @Override
+    public List<LifeConfig> getConfigData() {
+        return lifeConfigMapper.selectList(Wrappers.<LifeConfig>lambdaQuery());
     }
 }
