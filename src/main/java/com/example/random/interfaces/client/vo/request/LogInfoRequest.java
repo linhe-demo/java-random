@@ -18,4 +18,9 @@ public class LogInfoRequest {
      * 操作人
      */
     private String actionUser;
+
+    /**
+     * ip 地址
+     */
+    private String ip;
 }
