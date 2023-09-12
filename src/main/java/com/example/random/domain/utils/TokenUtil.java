@@ -5,7 +5,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.example.random.domain.entity.UserInfo;
-import com.example.random.service.LifeMomentService;
+import com.example.random.domain.repository.UserInfoRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -24,14 +24,14 @@ import java.util.Objects;
  */
 @Component
 public class TokenUtil {
-    private static LifeMomentService staticLifeMomentService;
+    private static UserInfoRepository staticUserInfoRepository;
 
     @Resource
-    private LifeMomentService lifeMomentService;
+    private  UserInfoRepository userInfoRepository;
 
     @PostConstruct
     public void setLifeMomentService() {
-        staticLifeMomentService = lifeMomentService;
+        staticUserInfoRepository = userInfoRepository;
     }
 
     public static String getToken(String userId, String password) {
@@ -48,10 +48,10 @@ public class TokenUtil {
     public static UserInfo getCurrentUser() {
         try {
             HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-            String token = request.getHeader("token");
+            String token = request.getHeader("Authorization");
             if (StringUtils.isNotEmpty(token)) {
                 String userId = JWT.decode(token).getAudience().get(0);
-                return staticLifeMomentService.findById(Integer.valueOf(userId));
+                return staticUserInfoRepository.getById(Integer.valueOf(userId));
             }
         } catch (Exception e) {
             return null;

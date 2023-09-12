@@ -22,9 +22,9 @@ import com.example.random.interfaces.controller.put.response.life.LifeResponse;
 import com.example.random.interfaces.controller.put.response.user.RegisterResponse;
 import com.example.random.interfaces.controller.put.response.user.UserResponse;
 import lombok.RequiredArgsConstructor;
-import net.sf.jsqlparser.expression.StringValue;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -37,9 +37,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 
-
+@Lazy
 @Service
 @RequiredArgsConstructor
 public class LifeMomentService {
@@ -71,7 +70,7 @@ public class LifeMomentService {
         UserInfo user = TokenUtil.getCurrentUser();
         LogInfoRequest param = new LogInfoRequest();
         param.setAction("photo");
-        param.setActionUser(Objects.requireNonNull(user).getUserName());
+        param.setActionUser("cc");
         param.setIp(ToolsUtil.getIp(ip));
         //记录日志
         logClient.saveLogInfo(param);
@@ -144,9 +143,5 @@ public class LifeMomentService {
         logClient.saveLogInfo(param);
         backInfo.setMsg(CommonEnum.REGISTRATION_SUCCESS.getValue());
         return backInfo;
-    }
-
-    public UserInfo findById(Integer id) {
-        return userInfoRepository.getById(id);
     }
 }

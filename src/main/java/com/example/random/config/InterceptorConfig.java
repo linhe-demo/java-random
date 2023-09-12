@@ -15,14 +15,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 
 @Configuration
 public class InterceptorConfig extends WebMvcConfigurationSupport {
-    @Autowired
-    JwtInterceptor jwtInterceptor;
-
-    //增加拦截的规则
-    @Override
-    protected void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(jwtInterceptor)//将自己写好的拦截类放进来
-                .addPathPatterns("/**")//拦截所有
-                .excludePathPatterns("/api/v1/user/login", "/api/v1/user/register");//这两个放行
-    }
+//    @Autowired
+//    JwtInterceptor jwtInterceptor;
+//
+//    //增加拦截的规则
+//    @Override
+//    protected void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(jwtInterceptor)//将自己写好的拦截类放进来
+//                .addPathPatterns("/**")//拦截所有
+//                .excludePathPatterns("/api/v1/user/login", "/api/v1/user/register", "/api/v1/life/moment");//这两个放行
+//    }
 }

@@ -6,12 +6,11 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.example.random.domain.common.exception.NewException;
 import com.example.random.domain.common.support.ErrorCodeEnum;
 import com.example.random.domain.entity.UserInfo;
+import com.example.random.domain.repository.UserInfoRepository;
 import com.example.random.domain.utils.ToolsUtil;
 import com.example.random.domain.value.RedisInfo;
-import com.example.random.service.LifeMomentService;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -32,14 +31,13 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class JwtInterceptor implements HandlerInterceptor {
     //注入service用于验证对象
-    @Autowired
-    private final LifeMomentService lifeMomentService;
+    private final UserInfoRepository userInfoRepository;
     private final RedissonClient redissonClient;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         //在请求头中获取token
-        String token = request.getHeader("token");
+        String token = request.getHeader("Authorization");
 
         //若为空则抛出异常
         if (StringUtils.isEmpty(token)) {
@@ -55,7 +53,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
 
         //判断该id的用户是否存在
-        UserInfo user = lifeMomentService.findById(Integer.valueOf(userId));
+        UserInfo user = userInfoRepository.getById(Integer.valueOf(userId));
         if (ObjectUtils.isEmpty(user)) {
             throw new NewException(ErrorCodeEnum.USER_NOT_EXIST.getCode(), ErrorCodeEnum.USER_NOT_EXIST.getMsg());
         }
@@ -63,8 +61,6 @@ public class JwtInterceptor implements HandlerInterceptor {
         //检查用户是token是否过期
         String redisToken = (String) redissonClient.getBucket(String.format("%s-linHeDemo", user.getId())).get();
         RedisInfo redisInfo = ToolsUtil.convertToObject(redisToken, RedisInfo.class);
-        System.out.println(redisInfo.getToken());
-        System.out.println(token);
         if (!Objects.equals(redisInfo.getToken(), token)) {
             throw new NewException(ErrorCodeEnum.TOKEN_HAS_EXPIRED.getCode(), ErrorCodeEnum.TOKEN_HAS_EXPIRED.getMsg());
         }

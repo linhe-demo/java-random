@@ -2,8 +2,8 @@ package com.example.random.domain.common.advice;
 
 import com.example.random.domain.common.exception.NewException;
 import com.example.random.domain.output.JsonResponse;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
