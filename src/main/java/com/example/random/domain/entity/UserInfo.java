@@ -44,6 +44,10 @@ public class UserInfo implements Serializable {
      * 明码
      */
     private String clearCode;
+    /**
+     * 账号状态 0 未激活 1 已激活
+     */
+    private Integer status;
 
     /**
      * 创建时间
@@ -54,4 +58,9 @@ public class UserInfo implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+
+    /**
+     * 最后一次登录时间
+     */
+    private Date lastLoginTime;
 }

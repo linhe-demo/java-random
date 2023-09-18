@@ -20,7 +20,8 @@ public enum ErrorCodeEnum implements CodeAndMsg {
     TOKEN_PARSING_IS_INCORRECT(10004, "token 解析异常"),
     USER_TOKEN_IS_INCORRECT(10005, "用户token 验证失败"),
     USER_ALREADY_EXISTS(10006, "用户已存在！"),
-    TOKEN_HAS_EXPIRED(10007, "token 已过期")
+    TOKEN_HAS_EXPIRED(10007, "token 已过期"),
+    ACCOUNT_IS_NOT_ACTIVATED(10008, "账号未激活，请联系管理员激活！")
     ;
     private Integer code;
     private String msg;

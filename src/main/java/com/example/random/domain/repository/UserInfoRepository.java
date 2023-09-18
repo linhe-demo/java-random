@@ -28,4 +28,11 @@ public interface UserInfoRepository {
      * @param request 用户注册信息
      */
     void saveUserInfo(RegisterRequest request);
+
+    /**
+     * 根据用户ID 更新用户信息
+     *
+     * @param uid 用户uid
+     */
+    void updateUserById(Integer uid);
 }

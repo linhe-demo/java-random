@@ -70,7 +70,7 @@ public class LifeMomentService {
         UserInfo user = TokenUtil.getCurrentUser();
         LogInfoRequest param = new LogInfoRequest();
         param.setAction("photo");
-        param.setActionUser("cc");
+        param.setActionUser(Objects.requireNonNull(user).getUserName());
         param.setIp(ToolsUtil.getIp(ip));
         //记录日志
         logClient.saveLogInfo(param);
@@ -101,6 +101,10 @@ public class LifeMomentService {
             throw new NewException(ErrorCodeEnum.USER_NOT_EXIST.getCode(), ErrorCodeEnum.USER_NOT_EXIST.getMsg());
         }
 
+        if (!Objects.equals(userInfo.getStatus(), 1)) {
+            throw new NewException(ErrorCodeEnum.ACCOUNT_IS_NOT_ACTIVATED.getCode(), ErrorCodeEnum.ACCOUNT_IS_NOT_ACTIVATED.getMsg());
+        }
+
         LogInfoRequest param = new LogInfoRequest();
         param.setAction("login");
         param.setActionUser(request.getUserName());
@@ -121,6 +125,8 @@ public class LifeMomentService {
             backInfo.setExpiredTime(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + 86400 * 7);
             backInfo.setNickname(userInfo.getNickname());
             backInfo.setToken(token);
+            //更新用户最近一次登录时间
+            userInfoRepository.updateUserById(userInfo.getId());
         } else {
             throw new NewException(ErrorCodeEnum.WRONG_USER_PASSWORD.getCode(), ErrorCodeEnum.WRONG_USER_PASSWORD.getMsg());
         }

@@ -1,6 +1,7 @@
 package com.example.random.domain.repository.impl;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.random.domain.entity.UserInfo;
 import com.example.random.domain.repository.UserInfoRepository;
@@ -37,5 +38,14 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
         user.setClearCode(request.getPassWord());
         user.setCreateTime(new Date());
         userInfoMapper.insert(user);
+    }
+
+    @Override
+    public void updateUserById(Integer uid) {
+        UserInfo user = new UserInfo();
+        user.setLastLoginTime(new Date());
+        UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", uid);
+        userInfoMapper.update(user, updateWrapper);
     }
 }
