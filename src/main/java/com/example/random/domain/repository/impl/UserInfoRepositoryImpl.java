@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.random.domain.entity.UserInfo;
 import com.example.random.domain.repository.UserInfoRepository;
+import com.example.random.domain.utils.BeanCopierUtil;
 import com.example.random.domain.utils.MD5Util;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
 import com.example.random.interfaces.mapper.UserInfoMapper;
@@ -41,11 +42,11 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
     }
 
     @Override
-    public void updateUserById(Integer uid) {
-        UserInfo user = new UserInfo();
-        user.setLastLoginTime(new Date());
-        UpdateWrapper<UserInfo> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("id", uid);
-        userInfoMapper.update(user, updateWrapper);
+    public void updateUserById(UserInfo oldUser) {
+        UserInfo newUser = new UserInfo();
+        BeanCopierUtil.copy(oldUser, newUser);
+        newUser.setLastLoginTime(new Date());
+        System.out.println(new Date());
+        userInfoMapper.updateById(newUser);
     }
 }

@@ -34,5 +34,5 @@ public interface UserInfoRepository {
      *
      * @param uid 用户uid
      */
-    void updateUserById(Integer uid);
+    void updateUserById(UserInfo uid);
 }

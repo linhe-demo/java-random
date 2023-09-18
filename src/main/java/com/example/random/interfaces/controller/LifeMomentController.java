@@ -8,6 +8,7 @@ import com.example.random.interfaces.controller.put.request.user.RegisterRequest
 import com.example.random.interfaces.controller.put.request.user.UserRequest;
 import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeResponse;
+import com.example.random.interfaces.controller.put.response.user.AlbumResponse;
 import com.example.random.interfaces.controller.put.response.user.RegisterResponse;
 import com.example.random.interfaces.controller.put.response.user.UserResponse;
 import com.example.random.service.LifeMomentService;
@@ -44,5 +45,10 @@ public class LifeMomentController {
     @PostMapping("user/register")
     public ResponseEntity<ApiResponse<RegisterResponse>> userRegister(@RequestBody RegisterRequest request, HttpServletRequest ip) {
         return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.userRegister(request, ip)));
+    }
+
+    @PostMapping("album/list")
+    public ResponseEntity<ApiResponse<List<AlbumResponse>>> userRegister(HttpServletRequest ip) {
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.getAlbumList(ip)));
     }
 }

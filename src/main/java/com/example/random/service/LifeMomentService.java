@@ -3,8 +3,10 @@ package com.example.random.service;
 import com.example.random.domain.common.exception.NewException;
 import com.example.random.domain.common.support.ErrorCodeEnum;
 import com.example.random.domain.constant.CommonEnum;
+import com.example.random.domain.entity.AlbumConfig;
 import com.example.random.domain.entity.LifeConfig;
 import com.example.random.domain.entity.UserInfo;
+import com.example.random.domain.repository.AlbumConfigRepository;
 import com.example.random.domain.repository.LifeConfigRepository;
 import com.example.random.domain.repository.UserInfoRepository;
 import com.example.random.domain.utils.BeanCopierUtil;
@@ -19,6 +21,7 @@ import com.example.random.interfaces.controller.put.request.user.RegisterRequest
 import com.example.random.interfaces.controller.put.request.user.UserRequest;
 import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeResponse;
+import com.example.random.interfaces.controller.put.response.user.AlbumResponse;
 import com.example.random.interfaces.controller.put.response.user.RegisterResponse;
 import com.example.random.interfaces.controller.put.response.user.UserResponse;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 public class LifeMomentService {
     private final LifeConfigRepository lifeConfigRepository;
     private final UserInfoRepository userInfoRepository;
+    private final AlbumConfigRepository albumConfigRepository;
     private final RedissonClient redissonClient;
     private final LogClient logClient;
 
@@ -126,14 +130,14 @@ public class LifeMomentService {
             backInfo.setNickname(userInfo.getNickname());
             backInfo.setToken(token);
             //更新用户最近一次登录时间
-            userInfoRepository.updateUserById(userInfo.getId());
+            userInfoRepository.updateUserById(userInfo);
         } else {
             throw new NewException(ErrorCodeEnum.WRONG_USER_PASSWORD.getCode(), ErrorCodeEnum.WRONG_USER_PASSWORD.getMsg());
         }
         return backInfo;
     }
 
-    public RegisterResponse userRegister (RegisterRequest request, HttpServletRequest ip) {
+    public RegisterResponse userRegister(RegisterRequest request, HttpServletRequest ip) {
         RegisterResponse backInfo = new RegisterResponse();
         UserInfo userInfo = userInfoRepository.findByUserName(request.getUserName());
         if (!ObjectUtils.isEmpty(userInfo)) {
@@ -148,6 +152,25 @@ public class LifeMomentService {
         param.setIp(ToolsUtil.getIp(ip));
         logClient.saveLogInfo(param);
         backInfo.setMsg(CommonEnum.REGISTRATION_SUCCESS.getValue());
+        return backInfo;
+    }
+
+    public List<AlbumResponse> getAlbumList(HttpServletRequest ip) {
+        List<AlbumResponse> backInfo = new ArrayList<>();
+        List<AlbumConfig> list = albumConfigRepository.getAlbumConfig();
+        list.forEach(i -> {
+            AlbumResponse albumResponse = new AlbumResponse();
+            BeanCopierUtil.copy(i, albumResponse);
+            albumResponse.setDate(ToolsUtil.convertTimestampToStandardFormatDay(i.getDate().getTime()));
+            backInfo.add(albumResponse);
+        });
+        UserInfo user = TokenUtil.getCurrentUser();
+        LogInfoRequest param = new LogInfoRequest();
+        param.setAction("album-list");
+        param.setActionUser(Objects.requireNonNull(user).getUserName());
+        param.setIp(ToolsUtil.getIp(ip));
+        //记录日志
+        logClient.saveLogInfo(param);
         return backInfo;
     }
 }

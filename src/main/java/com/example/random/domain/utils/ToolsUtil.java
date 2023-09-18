@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,5 +76,11 @@ public class ToolsUtil {
             clientIp = ip.getRemoteAddr();
         }
         return clientIp;
+    }
+
+    public static String convertTimestampToStandardFormatDay(Long timestamp) {
+        Instant instant = Instant.ofEpochMilli(timestamp);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
+        return formatter.format(instant);
     }
 }
