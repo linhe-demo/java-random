@@ -31,4 +31,8 @@ public class AlbumResponse {
      * 相册时间
      */
     private String date;
+    /**
+     * 主题颜色
+     */
+    private String theme;
 }

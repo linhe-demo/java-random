@@ -1,6 +1,7 @@
 package com.example.random.domain.output;
 
 import com.example.random.domain.constant.CommonCode;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter

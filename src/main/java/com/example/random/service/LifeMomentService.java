@@ -158,11 +158,14 @@ public class LifeMomentService {
     public List<AlbumResponse> getAlbumList(HttpServletRequest ip) {
         List<AlbumResponse> backInfo = new ArrayList<>();
         List<AlbumConfig> list = albumConfigRepository.getAlbumConfig();
+        final Integer[] num = {1};
         list.forEach(i -> {
             AlbumResponse albumResponse = new AlbumResponse();
             BeanCopierUtil.copy(i, albumResponse);
             albumResponse.setDate(ToolsUtil.convertTimestampToStandardFormatDay(i.getDate().getTime()));
+            albumResponse.setTheme(String.format("right theme-%d", num[0] % 4));
             backInfo.add(albumResponse);
+            num[0]++;
         });
         UserInfo user = TokenUtil.getCurrentUser();
         LogInfoRequest param = new LogInfoRequest();
@@ -172,5 +175,20 @@ public class LifeMomentService {
         //记录日志
         logClient.saveLogInfo(param);
         return backInfo;
+    }
+
+    public Boolean autoLogin(HttpServletRequest ip) {
+        UserInfo user = TokenUtil.getCurrentUser();
+        //检查缓存中是否存在用户登录信息
+        RBucket<String> bucket = redissonClient.getBucket(String.format("%s-linHeDemo", Objects.requireNonNull(user).getId()));
+
+        LogInfoRequest param = new LogInfoRequest();
+        param.setAction("auto-login");
+        param.setActionUser(Objects.requireNonNull(user).getUserName());
+        param.setIp(ToolsUtil.getIp(ip));
+        //记录日志
+        logClient.saveLogInfo(param);
+
+        return Objects.nonNull(bucket);
     }
 }

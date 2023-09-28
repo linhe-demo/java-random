@@ -60,9 +60,12 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         //检查用户是token是否过期
         String redisToken = (String) redissonClient.getBucket(String.format("%s-linHeDemo", user.getId())).get();
+        if (Objects.isNull(redisToken)) {
+            throw new NewException(ErrorCodeEnum.TOKEN_HAS_EXPIRED.getCode(), ErrorCodeEnum.TOKEN_HAS_EXPIRED.getMsg());
+        }
         RedisInfo redisInfo = ToolsUtil.convertToObject(redisToken, RedisInfo.class);
         if (!Objects.equals(redisInfo.getToken(), token)) {
-            throw new NewException(ErrorCodeEnum.TOKEN_HAS_EXPIRED.getCode(), ErrorCodeEnum.TOKEN_HAS_EXPIRED.getMsg());
+            throw new NewException(ErrorCodeEnum.TOKEN_PARSING_IS_INCORRECT.getCode(), ErrorCodeEnum.TOKEN_PARSING_IS_INCORRECT.getMsg());
         }
         //核心：进行验证
         JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getPassword())).build();

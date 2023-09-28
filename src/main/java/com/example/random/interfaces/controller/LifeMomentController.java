@@ -51,4 +51,9 @@ public class LifeMomentController {
     public ResponseEntity<ApiResponse<List<AlbumResponse>>> userRegister(HttpServletRequest ip) {
         return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.getAlbumList(ip)));
     }
+
+    @PostMapping("auto/login")
+    public ResponseEntity<ApiResponse<Boolean>> autoLogin(HttpServletRequest ip){
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.autoLogin(ip)));
+    }
 }
