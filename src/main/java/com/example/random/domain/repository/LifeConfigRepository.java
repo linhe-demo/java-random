@@ -10,7 +10,7 @@ public interface LifeConfigRepository {
      *
      * @param num 照片数量
      */
-    List<LifeConfig> getLifeConfigData(Integer num);
+    List<LifeConfig> getLifeConfigData(Integer id);
 
     /**
      * 获取配置数据

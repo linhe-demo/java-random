@@ -39,3 +39,6 @@ stages/config
 /src/main/resources/application.properties
 
 /src/main/resources/application.yaml
+
+/images
+/src/main/java/com/example/random/domain/constant/CommonEnum.java

@@ -21,7 +21,12 @@ public enum ErrorCodeEnum implements CodeAndMsg {
     USER_TOKEN_IS_INCORRECT(10005, "用户token 验证失败"),
     USER_ALREADY_EXISTS(10006, "用户已存在！"),
     TOKEN_HAS_EXPIRED(10007, "token 已过期"),
-    ACCOUNT_IS_NOT_ACTIVATED(10008, "账号未激活，请联系管理员激活！")
+    ACCOUNT_IS_NOT_ACTIVATED(10008, "账号未激活，请联系管理员激活！"),
+    FILE_IS_EMPTY(10009, "文件不能为空！"),
+    FILE_UPLOAD_FAIL(10010, "文件上传失败！"),
+    UN_SUPPORT_IMAGE_TYPE(10011, "不支持的图片类型"),
+    FAIL_HANDLE_FILE(10012, "压缩图片失败"),
+    REGISTRATION_SUCCESS(10013, "注册成功， 请使用注册的账号登录")
     ;
     private Integer code;
     private String msg;

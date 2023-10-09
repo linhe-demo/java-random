@@ -2,20 +2,17 @@ package com.example.random.service;
 
 import com.example.random.domain.common.exception.NewException;
 import com.example.random.domain.common.support.ErrorCodeEnum;
-import com.example.random.domain.constant.CommonEnum;
 import com.example.random.domain.entity.AlbumConfig;
 import com.example.random.domain.entity.LifeConfig;
 import com.example.random.domain.entity.UserInfo;
 import com.example.random.domain.repository.AlbumConfigRepository;
 import com.example.random.domain.repository.LifeConfigRepository;
 import com.example.random.domain.repository.UserInfoRepository;
-import com.example.random.domain.utils.BeanCopierUtil;
-import com.example.random.domain.utils.MD5Util;
-import com.example.random.domain.utils.TokenUtil;
-import com.example.random.domain.utils.ToolsUtil;
+import com.example.random.domain.utils.*;
 import com.example.random.domain.value.RedisInfo;
 import com.example.random.interfaces.client.LogClient;
 import com.example.random.interfaces.client.vo.request.LogInfoRequest;
+import com.example.random.interfaces.client.vo.response.ImageInfoResponse;
 import com.example.random.interfaces.controller.put.request.life.LifeRequest;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
 import com.example.random.interfaces.controller.put.request.user.UserRequest;
@@ -31,13 +28,18 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+
+import okhttp3.*;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -55,14 +57,13 @@ public class LifeMomentService {
         List<LifeResponse> list = new ArrayList<>();
         List<LifeConfig> data;
         try {
-            data = lifeConfigRepository.getLifeConfigData(request.getNum());
+            data = lifeConfigRepository.getLifeConfigData(request.getId());
         } catch (NullPointerException e) {
-            return list;
+            return new ArrayList<>();
         }
 
         if (CollectionUtils.isEmpty(data)) {
-            LifeResponse info = new LifeResponse();
-            list.add(info);
+            return new ArrayList<>();
         } else {
             data.forEach(i -> {
                 LifeResponse info = new LifeResponse();
@@ -151,7 +152,7 @@ public class LifeMomentService {
         param.setActionUser(request.getUserName());
         param.setIp(ToolsUtil.getIp(ip));
         logClient.saveLogInfo(param);
-        backInfo.setMsg(CommonEnum.REGISTRATION_SUCCESS.getValue());
+        backInfo.setMsg(ErrorCodeEnum.REGISTRATION_SUCCESS.getMsg());
         return backInfo;
     }
 
@@ -190,5 +191,98 @@ public class LifeMomentService {
         logClient.saveLogInfo(param);
 
         return Objects.nonNull(bucket);
+    }
+
+    public Boolean upload(MultipartFile[] files, HttpServletRequest ip) {
+        System.out.println(Arrays.toString(files));
+        if (files == null || ObjectUtils.isEmpty(files)) {
+            throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
+        }
+        for (MultipartFile file : files) {
+            String fileName = file.getOriginalFilename();
+            try {
+                //保存文件到本地
+                File mkdir = new File("images\\tmp");
+                if (!mkdir.exists()) {
+                    mkdir.mkdirs();
+                }
+                long id = SnowflakeUtil.generateId();
+                String filePath = String.format("%s\\%s-%s", mkdir.getPath(), id, fileName);
+                //定义输出流，将文件写入硬盘
+                FileOutputStream os = new FileOutputStream(filePath);
+                InputStream in = file.getInputStream();
+                int b = 0;
+                while ((b = in.read()) != -1) { //读取文件
+                    os.write(b);
+                }
+                os.flush(); //关闭流
+                in.close();
+                os.close();
+
+                //调用第三方压缩图片
+                String newPath = compressionImage(filePath, fileName);
+                //上传第三方保存图片
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new NewException(ErrorCodeEnum.FILE_UPLOAD_FAIL.getCode(), ErrorCodeEnum.FILE_UPLOAD_FAIL.getMsg());
+            }
+        }
+        return true;
+    }
+
+    public String compressionImage(String filePath, String fileName) {
+        try {
+            // 创建OkHttpClient
+            OkHttpClient client = new OkHttpClient();
+
+            // 创建表单数据
+            MultipartBody.Builder builder = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM);
+
+            // 添加其他参数
+            builder.addFormDataPart("name", fileName);
+            builder.addFormDataPart("type", "");
+
+            try {
+                Path path = Paths.get(filePath);
+                String type = Files.probeContentType(path);
+                switch (type) {
+                    case "image/gif":
+                        builder.addFormDataPart("file", fileName, RequestBody.create(MediaType.parse("image/gif"), new File(filePath)));
+                        break;
+                    case "image/jpeg":
+                        builder.addFormDataPart("file", fileName, RequestBody.create(MediaType.parse("image/jpeg"), new File(filePath)));
+                        break;
+                    case "image/png":
+                        builder.addFormDataPart("file", fileName, RequestBody.create(MediaType.parse("image/png"), new File(filePath)));
+                        break;
+                    default:
+                        throw new NewException(ErrorCodeEnum.UN_SUPPORT_IMAGE_TYPE.getCode(), ErrorCodeEnum.UN_SUPPORT_IMAGE_TYPE.getMsg());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // 构建请求体
+            MultipartBody requestBody = builder.build();
+
+            // 创建请求
+            Request request = new Request.Builder()
+                    .url(CommonEnum.IMAGE_HANDLE_URL.getValue())
+                    .post(requestBody)
+                    .build();
+
+            // 发送请求并处理响应
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                }
+                ImageInfoResponse info = ToolsUtil.convertToObject(response.body().string(), ImageInfoResponse.class);
+                return info.getPath();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new NewException(ErrorCodeEnum.UN_SUPPORT_IMAGE_TYPE.getCode(), ErrorCodeEnum.UN_SUPPORT_IMAGE_TYPE.getMsg());
+        }
     }
 }

@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class LifeRequest {
     /**
-     * 请求数量
+     * 相册id
      */
-    private Integer num;
+    private Integer id;
 }

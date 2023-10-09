@@ -16,10 +16,10 @@ public class LifeConfigRepositoryImpl implements LifeConfigRepository {
     private final LifeConfigMapper lifeConfigMapper;
 
     @Override
-    public List<LifeConfig> getLifeConfigData(Integer num) {
+    public List<LifeConfig> getLifeConfigData(Integer id) {
         return lifeConfigMapper.selectList(Wrappers.<LifeConfig>lambdaQuery()
                 .eq(LifeConfig::getStatus, 2)
-                .last(String.format(" ORDER BY RAND() LIMIT %s ", num)));
+                .eq(LifeConfig::getConfigId, id));
     }
 
     @Override

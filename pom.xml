@@ -76,9 +76,27 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.9.1</version> <!-- 可以根据你的需求选择合适的版本 -->
+        </dependency>
+
+        <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
             <version>3.4.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.qiniu</groupId>
+            <artifactId>qiniu-java-sdk</artifactId>
+            <version>[7.13.0, 7.13.99]</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-generator -->

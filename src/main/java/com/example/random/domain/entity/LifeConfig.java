@@ -29,6 +29,10 @@ public class LifeConfig implements Serializable {
     private Integer id;
 
     /**
+     * 图片配置id
+     */
+    private Integer configId;
+    /**
      * 图片路由
      */
     private String imgUrl;

@@ -13,9 +13,9 @@ import com.example.random.interfaces.controller.put.response.user.RegisterRespon
 import com.example.random.interfaces.controller.put.response.user.UserResponse;
 import com.example.random.service.LifeMomentService;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -55,5 +55,9 @@ public class LifeMomentController {
     @PostMapping("auto/login")
     public ResponseEntity<ApiResponse<Boolean>> autoLogin(HttpServletRequest ip){
         return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.autoLogin(ip)));
+    }
+    @PostMapping("image/upload")
+    public ResponseEntity<ApiResponse<Boolean>> uploadFile (@RequestParam("files") MultipartFile[] files, HttpServletRequest ip){
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.upload(files, ip)));
     }
 }
