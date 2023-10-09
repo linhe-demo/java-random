@@ -57,7 +57,7 @@ public class LifeMomentController {
         return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.autoLogin(ip)));
     }
     @PostMapping("image/upload")
-    public ResponseEntity<ApiResponse<Boolean>> uploadFile (@RequestParam("files") MultipartFile[] files, HttpServletRequest ip){
-        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.upload(files, ip)));
+    public ResponseEntity<ApiResponse<Boolean>> uploadFile (@RequestParam("files") MultipartFile[] files, @RequestParam("id") Integer id, HttpServletRequest ip){
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.upload(files, id, ip)));
     }
 }

@@ -26,7 +26,9 @@ public enum ErrorCodeEnum implements CodeAndMsg {
     FILE_UPLOAD_FAIL(10010, "文件上传失败！"),
     UN_SUPPORT_IMAGE_TYPE(10011, "不支持的图片类型"),
     FAIL_HANDLE_FILE(10012, "压缩图片失败"),
-    REGISTRATION_SUCCESS(10013, "注册成功， 请使用注册的账号登录")
+    REGISTRATION_SUCCESS(10013, "注册成功， 请使用注册的账号登录"),
+    FAIL_UPLOAD_QI_NIU(10014, "七牛文件上传失败！"),
+    FAIL_READ_FILE(10016, "读取压缩文件失败！")
     ;
     private Integer code;
     private String msg;

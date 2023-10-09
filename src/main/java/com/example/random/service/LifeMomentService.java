@@ -2,6 +2,7 @@ package com.example.random.service;
 
 import com.example.random.domain.common.exception.NewException;
 import com.example.random.domain.common.support.ErrorCodeEnum;
+import com.example.random.domain.constant.CommonEnum;
 import com.example.random.domain.entity.AlbumConfig;
 import com.example.random.domain.entity.LifeConfig;
 import com.example.random.domain.entity.UserInfo;
@@ -30,11 +31,14 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
+import java.awt.image.BufferedImage;
 import java.io.*;
 
 import okhttp3.*;
 
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -67,7 +71,7 @@ public class LifeMomentService {
         } else {
             data.forEach(i -> {
                 LifeResponse info = new LifeResponse();
-                info.setImgUrl(CommonEnum.IMAGE_FILE_PATH.getValue() + i.getImgUrl() + ".jpg");
+                info.setImgUrl(CommonEnum.IMAGE_FILE_PATH.getValue() + i.getImgUrl());
                 info.setText(i.getText());
                 list.add(info);
             });
@@ -88,7 +92,7 @@ public class LifeMomentService {
         data.forEach(i -> {
             ConfigResponse tmpData = new ConfigResponse();
             BeanCopierUtil.copy(i, tmpData);
-            tmpData.setImgUrl(CommonEnum.IMAGE_FILE_PATH.getValue() + i.getImgUrl() + ".jpg");
+            tmpData.setImgUrl(CommonEnum.IMAGE_FILE_PATH.getValue() + i.getImgUrl());
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             tmpData.setCreateTime(dateFormat.format(i.getCreateTime()));
             if (i.getUpdateTime() != null) {
@@ -193,13 +197,16 @@ public class LifeMomentService {
         return Objects.nonNull(bucket);
     }
 
-    public Boolean upload(MultipartFile[] files, HttpServletRequest ip) {
-        System.out.println(Arrays.toString(files));
+    public Boolean upload(MultipartFile[] files, Integer configId, HttpServletRequest ip) {
+        UserInfo user = TokenUtil.getCurrentUser();
         if (files == null || ObjectUtils.isEmpty(files)) {
             throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
         }
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
+            assert fileName != null;
+            List<String> tmpList = Arrays.asList(fileName.split("\\."));
+            String tmpFormat = tmpList.get(tmpList.size() - 1);
             try {
                 //保存文件到本地
                 File mkdir = new File("images\\tmp");
@@ -207,7 +214,8 @@ public class LifeMomentService {
                     mkdir.mkdirs();
                 }
                 long id = SnowflakeUtil.generateId();
-                String filePath = String.format("%s\\%s-%s", mkdir.getPath(), id, fileName);
+                String filePath = String.format("%s\\%s.%s", mkdir.getPath(), id, tmpFormat);
+                String tmpFilePath = String.format("%s.%s", id, tmpFormat);
                 //定义输出流，将文件写入硬盘
                 FileOutputStream os = new FileOutputStream(filePath);
                 InputStream in = file.getInputStream();
@@ -220,13 +228,56 @@ public class LifeMomentService {
                 os.close();
 
                 //调用第三方压缩图片
-                String newPath = compressionImage(filePath, fileName);
-                //上传第三方保存图片
+                String newPath = compressionImage(filePath, String.valueOf(id));
+                // 将第三方压缩后的文件下载至本地
+                try {
+                    URL url = new URL(newPath);
+                    InputStream ins = url.openStream();
+
+                    FileOutputStream fos = new FileOutputStream(filePath);
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+
+                    while ((bytesRead = ins.read(buffer)) != -1) {
+                        fos.write(buffer, 0, bytesRead);
+                    }
+
+                    fos.close();
+                    in.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new NewException(ErrorCodeEnum.FAIL_READ_FILE.getCode(), ErrorCodeEnum.FAIL_READ_FILE.getMsg());
+                }
+
+                //将压缩后的文件上传至 七牛
+                String res = QiNiuUtil.uploadToQiNiu(filePath, String.valueOf(id));
+                //保存上传文件信息
+                lifeConfigRepository.SaveInfo(res, configId);
+                //删除本地缓存文件
+                File fileExist = new File(filePath);
+                // 判断文件是否存在
+                if (fileExist.exists()) {
+                    // 删除文件
+                    fileExist.delete();
+                }
+                // 删除压缩文件
+                fileExist = new File("/var/www/html/" + tmpFilePath);
+                // 判断文件是否存在
+                if (fileExist.exists()) {
+                    // 删除文件
+                    fileExist.delete();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new NewException(ErrorCodeEnum.FILE_UPLOAD_FAIL.getCode(), ErrorCodeEnum.FILE_UPLOAD_FAIL.getMsg());
             }
         }
+        LogInfoRequest param = new LogInfoRequest();
+        param.setAction("upload-image");
+        param.setActionUser(Objects.requireNonNull(user).getUserName());
+        param.setIp(ToolsUtil.getIp(ip));
+        //记录日志
+        logClient.saveLogInfo(param);
         return true;
     }
 

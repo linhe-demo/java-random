@@ -8,7 +8,7 @@ public interface LifeConfigRepository {
     /**
      * 获取生活照片配置
      *
-     * @param num 照片数量
+     * @param id 相册id
      */
     List<LifeConfig> getLifeConfigData(Integer id);
 
@@ -18,4 +18,12 @@ public interface LifeConfigRepository {
      * @return List<ConfigResponse>
      */
     List<LifeConfig> getConfigData();
+
+    /**
+     * 保存照片信息
+     *
+     * @param path 照片路径
+     * @param id   相册id
+     */
+    void SaveInfo(String path, Integer id);
 }
