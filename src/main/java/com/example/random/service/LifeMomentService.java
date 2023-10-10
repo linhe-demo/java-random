@@ -12,8 +12,10 @@ import com.example.random.domain.repository.UserInfoRepository;
 import com.example.random.domain.utils.*;
 import com.example.random.domain.value.RedisInfo;
 import com.example.random.interfaces.client.LogClient;
+import com.example.random.interfaces.client.vo.request.ImageDeleteRequest;
 import com.example.random.interfaces.client.vo.request.LogInfoRequest;
 import com.example.random.interfaces.client.vo.response.ImageInfoResponse;
+import com.example.random.interfaces.controller.put.request.album.AlbumConfigAddRequest;
 import com.example.random.interfaces.controller.put.request.life.LifeRequest;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
 import com.example.random.interfaces.controller.put.request.user.UserRequest;
@@ -31,9 +33,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
-import java.awt.image.BufferedImage;
 import java.io.*;
 
 import okhttp3.*;
@@ -199,8 +199,12 @@ public class LifeMomentService {
 
     public Boolean upload(MultipartFile[] files, Integer configId, HttpServletRequest ip) {
         UserInfo user = TokenUtil.getCurrentUser();
-        if (files == null || ObjectUtils.isEmpty(files)) {
+        assert user != null;
+        if (user.getId() != 1 && user.getId() != 2) {
             throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
+        }
+        if (files == null || ObjectUtils.isEmpty(files)) {
+            throw new NewException(ErrorCodeEnum.NO_PERMISSION.getCode(), ErrorCodeEnum.NO_PERMISSION.getMsg());
         }
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
@@ -213,7 +217,7 @@ public class LifeMomentService {
                 if (!mkdir.exists()) {
                     mkdir.mkdirs();
                 }
-                long id = SnowflakeUtil.generateId();
+                long id = System.currentTimeMillis();
                 String filePath = String.format("%s\\%s.%s", mkdir.getPath(), id, tmpFormat);
                 String tmpFilePath = String.format("%s.%s", id, tmpFormat);
                 //定义输出流，将文件写入硬盘
@@ -261,12 +265,9 @@ public class LifeMomentService {
                     fileExist.delete();
                 }
                 // 删除压缩文件
-                fileExist = new File("/var/www/html/" + tmpFilePath);
-                // 判断文件是否存在
-                if (fileExist.exists()) {
-                    // 删除文件
-                    fileExist.delete();
-                }
+                ImageDeleteRequest info = new ImageDeleteRequest();
+                info.setName(tmpFilePath);
+                logClient.deleteImage(info);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new NewException(ErrorCodeEnum.FILE_UPLOAD_FAIL.getCode(), ErrorCodeEnum.FILE_UPLOAD_FAIL.getMsg());
@@ -279,6 +280,27 @@ public class LifeMomentService {
         //记录日志
         logClient.saveLogInfo(param);
         return true;
+    }
+
+    public Boolean albumAdd(AlbumConfigAddRequest request, HttpServletRequest ip) {
+        UserInfo user = TokenUtil.getCurrentUser();
+        assert user != null;
+        if (user.getId() != 1 && user.getId() != 2) {
+            throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
+        }
+
+        int res = albumConfigRepository.saveAlbumConfig(request.getName(), request.getDesc(), request.getDate());
+        if (res > 0) {
+            LogInfoRequest param = new LogInfoRequest();
+            param.setAction("add-album");
+            param.setActionUser(Objects.requireNonNull(user).getUserName());
+            param.setIp(ToolsUtil.getIp(ip));
+            //记录日志
+            logClient.saveLogInfo(param);
+            return true;
+        } else {
+            throw new NewException(ErrorCodeEnum.FILE_UPLOAD_FAIL.getCode(), ErrorCodeEnum.FILE_UPLOAD_FAIL.getMsg());
+        }
     }
 
     public String compressionImage(String filePath, String fileName) {

@@ -1,5 +1,6 @@
 package com.example.random.interfaces.client;
 
+import com.example.random.interfaces.client.vo.request.ImageDeleteRequest;
 import com.example.random.interfaces.client.vo.request.LogInfoRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface LogClient {
     @PostMapping(path = "log/save", consumes = "application/json")
     String saveLogInfo(@RequestBody LogInfoRequest request);
+
+    @PostMapping(path = "image/delete", consumes = "application/json")
+    String deleteImage(@RequestBody ImageDeleteRequest request);
 }
 
 

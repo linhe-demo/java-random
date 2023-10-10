@@ -3,6 +3,7 @@ package com.example.random.interfaces.controller;
 
 import com.example.random.domain.output.ApiResponse;
 import com.example.random.interfaces.constant.Path;
+import com.example.random.interfaces.controller.put.request.album.AlbumConfigAddRequest;
 import com.example.random.interfaces.controller.put.request.life.LifeRequest;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
 import com.example.random.interfaces.controller.put.request.user.UserRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 
 
@@ -59,5 +61,10 @@ public class LifeMomentController {
     @PostMapping("image/upload")
     public ResponseEntity<ApiResponse<Boolean>> uploadFile (@RequestParam("files") MultipartFile[] files, @RequestParam("id") Integer id, HttpServletRequest ip){
         return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.upload(files, id, ip)));
+    }
+
+    @PostMapping("album/add")
+    public ResponseEntity<ApiResponse<Boolean>> albumAdd (@RequestBody AlbumConfigAddRequest request, HttpServletRequest ip){
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.albumAdd(request, ip)));
     }
 }
