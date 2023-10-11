@@ -17,7 +17,7 @@ public interface LifeConfigRepository {
      *
      * @return List<ConfigResponse>
      */
-    List<LifeConfig> getConfigData(Long id);
+    List<LifeConfig> getConfigData();
 
     /**
      * 保存照片信息

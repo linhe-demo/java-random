@@ -19,8 +19,10 @@ public class AlbumConfigRepositoryImpl implements AlbumConfigRepository {
 
     @Override
     @DS("life")
-    public List<AlbumConfig> getAlbumConfig() {
-        return albumConfigMapper.selectList(Wrappers.<AlbumConfig>lambdaQuery().eq(AlbumConfig::getStatus, 1));
+    public List<AlbumConfig> getAlbumConfig(Long id) {
+        return albumConfigMapper.selectList(Wrappers.<AlbumConfig>lambdaQuery()
+                .eq(AlbumConfig::getStatus, 1)
+                .eq(AlbumConfig::getPersonAlbumId, id));
     }
 
     @Override

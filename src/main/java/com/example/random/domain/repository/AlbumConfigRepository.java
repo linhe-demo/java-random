@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface AlbumConfigRepository {
-    List<AlbumConfig> getAlbumConfig();
+    List<AlbumConfig> getAlbumConfig(Long id);
 
     int saveAlbumConfig(String name, String desc, Date date, Long id);
 }

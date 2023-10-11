@@ -65,7 +65,7 @@ public class LifeMomentService {
         //检查用户是否拥有该相册权限
         assert user != null;
         AtomicBoolean status = new AtomicBoolean(false);
-        List<LifeConfig> albumData = lifeConfigRepository.getConfigData(user.getPersonAlbumId());
+        List<AlbumConfig> albumData = albumConfigRepository.getAlbumConfig(user.getPersonAlbumId());
         albumData.forEach(i -> {
             if (Objects.equals(i.getId(), request.getId())) {
                 status.set(true);
@@ -103,7 +103,7 @@ public class LifeMomentService {
         UserInfo user = TokenUtil.getCurrentUser();
         List<ConfigResponse> backData = new ArrayList<>();
         assert user != null;
-        List<LifeConfig> data = lifeConfigRepository.getConfigData(user.getPersonAlbumId());
+        List<LifeConfig> data = lifeConfigRepository.getConfigData();
         data.forEach(i -> {
             ConfigResponse tmpData = new ConfigResponse();
             BeanCopierUtil.copy(i, tmpData);
@@ -177,8 +177,9 @@ public class LifeMomentService {
     }
 
     public List<AlbumResponse> getAlbumList(HttpServletRequest ip) {
+        UserInfo user = TokenUtil.getCurrentUser();
         List<AlbumResponse> backInfo = new ArrayList<>();
-        List<AlbumConfig> list = albumConfigRepository.getAlbumConfig();
+        List<AlbumConfig> list = albumConfigRepository.getAlbumConfig(user.getPersonAlbumId());
         final Integer[] num = {1};
         list.forEach(i -> {
             AlbumResponse albumResponse = new AlbumResponse();
@@ -188,7 +189,6 @@ public class LifeMomentService {
             backInfo.add(albumResponse);
             num[0]++;
         });
-        UserInfo user = TokenUtil.getCurrentUser();
         LogInfoRequest param = new LogInfoRequest();
         param.setAction("album-list");
         param.setActionUser(Objects.requireNonNull(user).getUserName());
@@ -216,11 +216,11 @@ public class LifeMomentService {
     public Boolean upload(MultipartFile[] files, Integer configId, HttpServletRequest ip) {
         UserInfo user = TokenUtil.getCurrentUser();
         assert user != null;
-        if (user.getId() != 1 && user.getId() != 2) {
-            throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
-        }
+//        if (user.getId() != 1 && user.getId() != 2) {
+//            throw new NewException(ErrorCodeEnum.NO_PERMISSION.getCode(), ErrorCodeEnum.NO_PERMISSION.getMsg());
+//        }
         if (files == null || ObjectUtils.isEmpty(files)) {
-            throw new NewException(ErrorCodeEnum.NO_PERMISSION.getCode(), ErrorCodeEnum.NO_PERMISSION.getMsg());
+            throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
         }
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
@@ -303,9 +303,9 @@ public class LifeMomentService {
     public Boolean albumAdd(AlbumConfigAddRequest request, HttpServletRequest ip) {
         UserInfo user = TokenUtil.getCurrentUser();
         assert user != null;
-        if (user.getId() != 1 && user.getId() != 2) {
-            throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
-        }
+//        if (user.getId() != 1 && user.getId() != 2) {
+//            throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
+//        }
 
         int res = albumConfigRepository.saveAlbumConfig(request.getName(), request.getDesc(), request.getDate(), user.getPersonAlbumId());
         if (res > 0) {

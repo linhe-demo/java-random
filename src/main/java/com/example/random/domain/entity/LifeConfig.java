@@ -45,10 +45,6 @@ public class LifeConfig implements Serializable {
      * 启用状态 1: 未启用 2: 启用
      */
     private Integer status;
-    /**
-     * 私人相册id
-     */
-    private Long personAlbumId;
 
     /**
      * 创建时间
