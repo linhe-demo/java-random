@@ -267,7 +267,9 @@ public class LifeMomentService {
                 // 删除压缩文件
                 ImageDeleteRequest info = new ImageDeleteRequest();
                 info.setName(tmpFilePath);
-                logClient.deleteImage(info);
+                String res1 = logClient.deleteImage(info);
+                ImageInfoResponse back = ToolsUtil.convertToObject(res1, ImageInfoResponse.class);
+                System.out.println(back.getPath());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new NewException(ErrorCodeEnum.FILE_UPLOAD_FAIL.getCode(), ErrorCodeEnum.FILE_UPLOAD_FAIL.getMsg());
