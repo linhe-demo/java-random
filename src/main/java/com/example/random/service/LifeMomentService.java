@@ -45,6 +45,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 @Lazy
@@ -58,8 +59,21 @@ public class LifeMomentService {
     private final LogClient logClient;
 
     public List<LifeResponse> momentData(LifeRequest request, HttpServletRequest ip) {
+        UserInfo user = TokenUtil.getCurrentUser();
         List<LifeResponse> list = new ArrayList<>();
         List<LifeConfig> data;
+        //检查用户是否拥有该相册权限
+        assert user != null;
+        AtomicBoolean status = new AtomicBoolean(false);
+        List<LifeConfig> albumData = lifeConfigRepository.getConfigData(user.getPersonAlbumId());
+        albumData.forEach(i -> {
+            if (Objects.equals(i.getId(), request.getId())) {
+                status.set(true);
+            }
+        });
+        if (!status.get()) {
+            throw new NewException(ErrorCodeEnum.WITHOUT_PERMISSION.getCode(), ErrorCodeEnum.WITHOUT_PERMISSION.getMsg());
+        }
         try {
             data = lifeConfigRepository.getLifeConfigData(request.getId());
         } catch (NullPointerException e) {
@@ -76,7 +90,6 @@ public class LifeMomentService {
                 list.add(info);
             });
         }
-        UserInfo user = TokenUtil.getCurrentUser();
         LogInfoRequest param = new LogInfoRequest();
         param.setAction("photo");
         param.setActionUser(Objects.requireNonNull(user).getUserName());
@@ -87,8 +100,10 @@ public class LifeMomentService {
     }
 
     public List<ConfigResponse> configData() {
+        UserInfo user = TokenUtil.getCurrentUser();
         List<ConfigResponse> backData = new ArrayList<>();
-        List<LifeConfig> data = lifeConfigRepository.getConfigData();
+        assert user != null;
+        List<LifeConfig> data = lifeConfigRepository.getConfigData(user.getPersonAlbumId());
         data.forEach(i -> {
             ConfigResponse tmpData = new ConfigResponse();
             BeanCopierUtil.copy(i, tmpData);
@@ -148,6 +163,7 @@ public class LifeMomentService {
         if (!ObjectUtils.isEmpty(userInfo)) {
             throw new NewException(ErrorCodeEnum.USER_ALREADY_EXISTS.getCode(), ErrorCodeEnum.USER_ALREADY_EXISTS.getMsg());
         }
+
         //保存用户账号信息
         userInfoRepository.saveUserInfo(request);
         //记录日志
@@ -291,7 +307,7 @@ public class LifeMomentService {
             throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
         }
 
-        int res = albumConfigRepository.saveAlbumConfig(request.getName(), request.getDesc(), request.getDate());
+        int res = albumConfigRepository.saveAlbumConfig(request.getName(), request.getDesc(), request.getDate(), user.getPersonAlbumId());
         if (res > 0) {
             LogInfoRequest param = new LogInfoRequest();
             param.setAction("add-album");

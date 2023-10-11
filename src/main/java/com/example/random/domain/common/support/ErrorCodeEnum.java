@@ -30,7 +30,8 @@ public enum ErrorCodeEnum implements CodeAndMsg {
     FAIL_UPLOAD_QI_NIU(10014, "七牛文件上传失败！"),
     FAIL_READ_FILE(10016, "读取压缩文件失败！"),
     NO_PERMISSION(10017, "暂无权限请联系管理员"),
-    FAIL_ADD_ALBUM(10018, "相册配置添加失败！")
+    FAIL_ADD_ALBUM(10018, "相册配置添加失败！"),
+    WITHOUT_PERMISSION(10019, "您没有群贤查看该相册！")
     ;
     private Integer code;
     private String msg;

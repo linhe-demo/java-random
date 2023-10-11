@@ -25,11 +25,12 @@ public class AlbumConfigRepositoryImpl implements AlbumConfigRepository {
 
     @Override
     @DS("life")
-    public int saveAlbumConfig(String name, String desc, Date date) {
+    public int saveAlbumConfig(String name, String desc, Date date, Long id) {
         AlbumConfig info = new AlbumConfig();
         info.setTitle(name);
         info.setDesc(desc);
         info.setDate(date);
+        info.setPersonAlbumId(id);
         info.setCreateTime(new Date());
         info.setStatus(1);
         return albumConfigMapper.insert(info) ;

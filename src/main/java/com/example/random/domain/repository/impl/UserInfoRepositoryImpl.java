@@ -36,6 +36,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
         user.setUserName(request.getUserName());
         user.setPassword(MD5Util.getMD5(request.getPassWord()));
         user.setNickname(request.getNickname());
+        user.setPersonAlbumId(System.currentTimeMillis());
         user.setClearCode(request.getPassWord());
         user.setCreateTime(new Date());
         userInfoMapper.insert(user);

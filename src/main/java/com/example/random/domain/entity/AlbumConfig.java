@@ -48,6 +48,11 @@ public class AlbumConfig implements Serializable {
     private Integer status;
 
     /**
+     * 私人相册id
+     */
+    private Long personAlbumId;
+
+    /**
      * 创建时间
      */
     private Date createTime;

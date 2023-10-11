@@ -50,6 +50,11 @@ public class UserInfo implements Serializable {
     private Integer status;
 
     /**
+     * 个人相册id
+     */
+    private Long personAlbumId;
+
+    /**
      * 创建时间
      */
     private Date createTime;

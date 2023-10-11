@@ -24,8 +24,8 @@ public class LifeConfigRepositoryImpl implements LifeConfigRepository {
     }
 
     @Override
-    public List<LifeConfig> getConfigData() {
-        return lifeConfigMapper.selectList(Wrappers.<LifeConfig>lambdaQuery());
+    public List<LifeConfig> getConfigData(Long id) {
+        return lifeConfigMapper.selectList(Wrappers.<LifeConfig>lambdaQuery().eq(LifeConfig::getPersonAlbumId, id));
     }
 
     @Override
