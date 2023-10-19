@@ -2,13 +2,16 @@ package com.example.random.domain.repository.impl;
 
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.random.domain.entity.AlbumConfig;
 import com.example.random.domain.repository.AlbumConfigRepository;
 import com.example.random.interfaces.mapper.AlbumConfigMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -19,15 +22,17 @@ public class AlbumConfigRepositoryImpl implements AlbumConfigRepository {
 
     @Override
     @DS("life")
-    public List<AlbumConfig> getAlbumConfig(Long id) {
+    public List<AlbumConfig> getAlbumConfig(Long id, Date beginDate, Date endDate) {
         return albumConfigMapper.selectList(Wrappers.<AlbumConfig>lambdaQuery()
                 .eq(AlbumConfig::getStatus, 1)
-                .eq(AlbumConfig::getPersonAlbumId, id));
+                .eq(AlbumConfig::getPersonAlbumId, id)
+                .gt(beginDate != null, AlbumConfig::getDate, beginDate)
+                .lt(endDate != null, AlbumConfig::getDate, endDate));
     }
 
     @Override
     @DS("life")
-    public int saveAlbumConfig(String name, String desc, Date date, Long id) {
+    public int saveAlbumConfig(String name, String desc, LocalDate date, Long id) {
         AlbumConfig info = new AlbumConfig();
         info.setTitle(name);
         info.setDesc(desc);
@@ -35,6 +40,6 @@ public class AlbumConfigRepositoryImpl implements AlbumConfigRepository {
         info.setPersonAlbumId(id);
         info.setCreateTime(new Date());
         info.setStatus(1);
-        return albumConfigMapper.insert(info) ;
+        return albumConfigMapper.insert(info);
     }
 }

@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ToolsUtil {
@@ -82,5 +84,16 @@ public class ToolsUtil {
         Instant instant = Instant.ofEpochMilli(timestamp);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
         return formatter.format(instant);
+    }
+
+    public static Date StringToDate(String date) {
+        Date newDate = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  // 这是转换的格式，根据你实际的字符串格式进行调整
+        try {
+            newDate = sdf.parse(date);  // 将字符串转换为Date对象
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return newDate;
     }
 }

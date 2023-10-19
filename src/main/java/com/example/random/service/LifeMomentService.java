@@ -4,9 +4,11 @@ import com.example.random.domain.common.exception.NewException;
 import com.example.random.domain.common.support.ErrorCodeEnum;
 import com.example.random.domain.constant.CommonEnum;
 import com.example.random.domain.entity.AlbumConfig;
+import com.example.random.domain.entity.DateConfig;
 import com.example.random.domain.entity.LifeConfig;
 import com.example.random.domain.entity.UserInfo;
 import com.example.random.domain.repository.AlbumConfigRepository;
+import com.example.random.domain.repository.DateListRepository;
 import com.example.random.domain.repository.LifeConfigRepository;
 import com.example.random.domain.repository.UserInfoRepository;
 import com.example.random.domain.utils.*;
@@ -17,11 +19,14 @@ import com.example.random.interfaces.client.vo.request.LogInfoRequest;
 import com.example.random.interfaces.client.vo.response.ImageInfoResponse;
 import com.example.random.interfaces.controller.put.request.album.AlbumConfigAddRequest;
 import com.example.random.interfaces.controller.put.request.life.LifeRequest;
+import com.example.random.interfaces.controller.put.request.user.AlbumListRequest;
+import com.example.random.interfaces.controller.put.request.user.DateListRequest;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
 import com.example.random.interfaces.controller.put.request.user.UserRequest;
 import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeResponse;
 import com.example.random.interfaces.controller.put.response.user.AlbumResponse;
+import com.example.random.interfaces.controller.put.response.user.DateListResponse;
 import com.example.random.interfaces.controller.put.response.user.RegisterResponse;
 import com.example.random.interfaces.controller.put.response.user.UserResponse;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +62,7 @@ public class LifeMomentService {
     private final AlbumConfigRepository albumConfigRepository;
     private final RedissonClient redissonClient;
     private final LogClient logClient;
+    private final DateListRepository dateListRepository;
 
     public List<LifeResponse> momentData(LifeRequest request, HttpServletRequest ip) {
         UserInfo user = TokenUtil.getCurrentUser();
@@ -65,7 +71,7 @@ public class LifeMomentService {
         //检查用户是否拥有该相册权限
         assert user != null;
         AtomicBoolean status = new AtomicBoolean(false);
-        List<AlbumConfig> albumData = albumConfigRepository.getAlbumConfig(user.getPersonAlbumId());
+        List<AlbumConfig> albumData = albumConfigRepository.getAlbumConfig(user.getPersonAlbumId(), null, null);
         albumData.forEach(i -> {
             if (Objects.equals(i.getId(), request.getId())) {
                 status.set(true);
@@ -176,15 +182,17 @@ public class LifeMomentService {
         return backInfo;
     }
 
-    public List<AlbumResponse> getAlbumList(HttpServletRequest ip) {
+    public List<AlbumResponse> getAlbumList(AlbumListRequest request, HttpServletRequest ip) {
         UserInfo user = TokenUtil.getCurrentUser();
         List<AlbumResponse> backInfo = new ArrayList<>();
-        List<AlbumConfig> list = albumConfigRepository.getAlbumConfig(user.getPersonAlbumId());
+        assert user != null;
+
+        List<AlbumConfig> list = albumConfigRepository.getAlbumConfig(user.getPersonAlbumId(), ToolsUtil.StringToDate(String.format("%s-01-01 00:00:00", request.getDate())), ToolsUtil.StringToDate(String.format("%s-12-31 23:59:59", request.getDate())));
         final Integer[] num = {1};
         list.forEach(i -> {
             AlbumResponse albumResponse = new AlbumResponse();
             BeanCopierUtil.copy(i, albumResponse);
-            albumResponse.setDate(ToolsUtil.convertTimestampToStandardFormatDay(i.getDate().getTime()));
+            albumResponse.setDate(ToolsUtil.convertTimestampToStandardFormatDay(i.getDate().toEpochDay()));
             albumResponse.setTheme(String.format("right theme-%d", num[0] % 4));
             backInfo.add(albumResponse);
             num[0]++;
@@ -213,12 +221,23 @@ public class LifeMomentService {
         return Objects.nonNull(bucket);
     }
 
+    public List<String> dateList(DateListRequest request, HttpServletRequest ip) {
+        UserInfo user = TokenUtil.getCurrentUser();
+        assert user != null;
+        List<DateConfig> list = dateListRepository.getUserDateConfig(user.getPersonAlbumId());
+        if (CollectionUtils.isEmpty(list)) {
+            return new ArrayList<>();
+        }
+        List<String> backInfo = new ArrayList<>();
+        list.forEach(i -> {
+            backInfo.add(i.getDate());
+        });
+        return backInfo;
+    }
+
     public Boolean upload(MultipartFile[] files, Integer configId, HttpServletRequest ip) {
         UserInfo user = TokenUtil.getCurrentUser();
         assert user != null;
-//        if (user.getId() != 1 && user.getId() != 2) {
-//            throw new NewException(ErrorCodeEnum.NO_PERMISSION.getCode(), ErrorCodeEnum.NO_PERMISSION.getMsg());
-//        }
         if (files == null || ObjectUtils.isEmpty(files)) {
             throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
         }
@@ -231,7 +250,10 @@ public class LifeMomentService {
                 //保存文件到本地
                 File mkdir = new File("images\\tmp");
                 if (!mkdir.exists()) {
-                    mkdir.mkdirs();
+                    boolean res = mkdir.mkdirs();
+                    if (res) {
+                        throw new NewException(ErrorCodeEnum.FAIL_CREATE_FILE.getCode(), ErrorCodeEnum.FAIL_CREATE_FILE.getMsg());
+                    }
                 }
                 long id = System.currentTimeMillis();
                 String filePath = String.format("%s\\%s.%s", mkdir.getPath(), id, tmpFormat);
@@ -303,10 +325,12 @@ public class LifeMomentService {
     public Boolean albumAdd(AlbumConfigAddRequest request, HttpServletRequest ip) {
         UserInfo user = TokenUtil.getCurrentUser();
         assert user != null;
-//        if (user.getId() != 1 && user.getId() != 2) {
-//            throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
-//        }
-
+        //记录相册年份信息
+        String year = String.valueOf(request.getDate().getYear());
+        DateConfig info = dateListRepository.getDateConfigByIdAndYear(user.getPersonAlbumId(), year);
+        if (ObjectUtils.isEmpty(info)) {
+            dateListRepository.save(user.getPersonAlbumId(), year);
+        }
         int res = albumConfigRepository.saveAlbumConfig(request.getName(), request.getDesc(), request.getDate(), user.getPersonAlbumId());
         if (res > 0) {
             LogInfoRequest param = new LogInfoRequest();
