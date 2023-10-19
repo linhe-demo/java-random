@@ -48,6 +48,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -192,7 +193,7 @@ public class LifeMomentService {
         list.forEach(i -> {
             AlbumResponse albumResponse = new AlbumResponse();
             BeanCopierUtil.copy(i, albumResponse);
-            albumResponse.setDate(ToolsUtil.convertTimestampToStandardFormatDay(i.getDate().toEpochDay()));
+            albumResponse.setDate(i.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             albumResponse.setTheme(String.format("right theme-%d", num[0] % 4));
             backInfo.add(albumResponse);
             num[0]++;
