@@ -2,13 +2,11 @@ package com.example.random.domain.repository.impl;
 
 
 import com.baomidou.dynamic.datasource.annotation.DS;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.random.domain.entity.AlbumConfig;
 import com.example.random.domain.repository.AlbumConfigRepository;
 import com.example.random.interfaces.mapper.AlbumConfigMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -27,7 +25,8 @@ public class AlbumConfigRepositoryImpl implements AlbumConfigRepository {
                 .eq(AlbumConfig::getStatus, 1)
                 .eq(AlbumConfig::getPersonAlbumId, id)
                 .gt(beginDate != null, AlbumConfig::getDate, beginDate)
-                .lt(endDate != null, AlbumConfig::getDate, endDate));
+                .lt(endDate != null, AlbumConfig::getDate, endDate)
+                .last(" order by `date` ASC "));
     }
 
     @Override
