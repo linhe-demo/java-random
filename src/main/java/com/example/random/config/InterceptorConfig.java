@@ -1,10 +1,11 @@
 package com.example.random.config;
 
-import com.example.random.config.interceptor.JwtInterceptor;
+import com.example.random.config.interceptor.AuthenticationInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * 拦截器类
@@ -14,15 +15,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
  */
 
 @Configuration
-public class InterceptorConfig extends WebMvcConfigurationSupport {
+public class InterceptorConfig implements WebMvcConfigurer {
     @Autowired
-    JwtInterceptor jwtInterceptor;
+    AuthenticationInterceptor authenticationInterceptor;
 
-    //增加拦截的规则
     @Override
-    protected void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(jwtInterceptor)//将自己写好的拦截类放进来
-                .addPathPatterns("/**")//拦截所有
-                .excludePathPatterns("/api/v1/user/login", "/api/v1/user/register");//这两个放行
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(authenticationInterceptor())
+                .addPathPatterns("/**");
+    }
+    @Bean
+    public AuthenticationInterceptor authenticationInterceptor() {
+        return new AuthenticationInterceptor();
     }
 }

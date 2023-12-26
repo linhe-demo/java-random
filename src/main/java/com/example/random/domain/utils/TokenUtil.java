@@ -40,6 +40,7 @@ public class TokenUtil {
                 .sign(Algorithm.HMAC256(password));
     }
 
+
     /**
      * 获取当前登录的用户信息
      *

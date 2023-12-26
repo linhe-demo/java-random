@@ -29,9 +29,15 @@ import com.example.random.interfaces.controller.put.response.user.AlbumResponse;
 import com.example.random.interfaces.controller.put.response.user.DateListResponse;
 import com.example.random.interfaces.controller.put.response.user.RegisterResponse;
 import com.example.random.interfaces.controller.put.response.user.UserResponse;
+import com.example.random.interfaces.mq.message.UploadImgMessage;
+//import com.example.random.interfaces.mq.producer.UploadImgProducer;
+import com.example.random.interfaces.redis.message.UploadMessage;
+import com.example.random.interfaces.redis.producer.RedisQueue;
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.cms.PasswordRecipientId;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -61,9 +67,12 @@ public class LifeMomentService {
     private final LifeConfigRepository lifeConfigRepository;
     private final UserInfoRepository userInfoRepository;
     private final AlbumConfigRepository albumConfigRepository;
-    private final RedissonClient redissonClient;
     private final LogClient logClient;
     private final DateListRepository dateListRepository;
+    private final RedissonClient redissonClient;
+
+    @Autowired
+    private RedisQueue redisQueue;
 
     public List<LifeResponse> momentData(LifeRequest request, HttpServletRequest ip) {
         UserInfo user = TokenUtil.getCurrentUser();
@@ -236,6 +245,18 @@ public class LifeMomentService {
         return backInfo;
     }
 
+    public boolean test() {
+        for (int i = 0; i < 1000; i++) {
+            UploadImgMessage info = new UploadImgMessage();
+            info.setPath("hello world！");
+            info.setId(i);
+//            uploadImgProducer.SendMessage(info.toString());
+
+            redisQueue.push(info.toString());
+        }
+        return true;
+    }
+
     public Boolean upload(MultipartFile[] files, Integer configId, HttpServletRequest ip) {
         UserInfo user = TokenUtil.getCurrentUser();
         assert user != null;
@@ -269,46 +290,12 @@ public class LifeMomentService {
                 os.flush(); //关闭流
                 in.close();
                 os.close();
-
-                //调用第三方压缩图片
-                String newPath = compressionImage(filePath, String.valueOf(id));
-                // 将第三方压缩后的文件下载至本地
-                try {
-                    URL url = new URL(newPath);
-                    InputStream ins = url.openStream();
-
-                    FileOutputStream fos = new FileOutputStream(filePath);
-                    byte[] buffer = new byte[1024];
-                    int bytesRead;
-
-                    while ((bytesRead = ins.read(buffer)) != -1) {
-                        fos.write(buffer, 0, bytesRead);
-                    }
-
-                    fos.close();
-                    in.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new NewException(ErrorCodeEnum.FAIL_READ_FILE.getCode(), ErrorCodeEnum.FAIL_READ_FILE.getMsg());
-                }
-
-                //将压缩后的文件上传至 七牛
-                String res = QiNiuUtil.uploadToQiNiu(filePath, String.valueOf(id));
-                //保存上传文件信息
-                lifeConfigRepository.SaveInfo(res, configId);
-                //删除本地缓存文件
-                File fileExist = new File(filePath);
-                // 判断文件是否存在
-                if (fileExist.exists()) {
-                    // 删除文件
-                    fileExist.delete();
-                }
-                // 删除压缩文件
-                ImageDeleteRequest info = new ImageDeleteRequest();
-                info.setName(tmpFilePath);
-                String res1 = logClient.deleteImage(info);
-                ImageInfoResponse back = ToolsUtil.convertToObject(res1, ImageInfoResponse.class);
-                System.out.println(back.getPath());
+                UploadMessage info = new UploadMessage();
+                info.setId(id);
+                info.setPath(tmpFilePath);
+                info.setConfigId(configId);
+                // 向消息队列写入消息
+                redisQueue.push(info.toString());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new NewException(ErrorCodeEnum.FILE_UPLOAD_FAIL.getCode(), ErrorCodeEnum.FILE_UPLOAD_FAIL.getMsg());
