@@ -309,6 +309,7 @@ public class LifeMomentService {
         param.setIp(ToolsUtil.getIp(ip));
         //记录日志
         logClient.saveLogInfo(param);
+        redisQueue.delete(String.format("%s-uploadFile", user.getId()));
         return true;
     }
 
