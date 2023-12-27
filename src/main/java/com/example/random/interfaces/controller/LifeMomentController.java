@@ -76,9 +76,21 @@ public class LifeMomentController {
     }
 
     @UserLoginToken
+    @PostMapping("upload/progress")
+    public ResponseEntity<ApiResponse<Integer>> progress() {
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.progress()));
+    }
+
+    @UserLoginToken
     @PostMapping("album/add")
     public ResponseEntity<ApiResponse<Boolean>> albumAdd(@RequestBody AlbumConfigAddRequest request, HttpServletRequest ip) {
         return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.albumAdd(request, ip)));
+    }
+
+    @UserLoginToken
+    @PostMapping("clean/redis")
+    public ResponseEntity<ApiResponse<Boolean>> cleanRedis() {
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.cleanRedis()));
     }
 
     @UserLoginToken

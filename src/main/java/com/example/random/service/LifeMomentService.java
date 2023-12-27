@@ -14,7 +14,6 @@ import com.example.random.domain.repository.UserInfoRepository;
 import com.example.random.domain.utils.*;
 import com.example.random.domain.value.RedisInfo;
 import com.example.random.interfaces.client.LogClient;
-import com.example.random.interfaces.client.vo.request.ImageDeleteRequest;
 import com.example.random.interfaces.client.vo.request.LogInfoRequest;
 import com.example.random.interfaces.client.vo.response.ImageInfoResponse;
 import com.example.random.interfaces.controller.put.request.album.AlbumConfigAddRequest;
@@ -26,15 +25,12 @@ import com.example.random.interfaces.controller.put.request.user.UserRequest;
 import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeResponse;
 import com.example.random.interfaces.controller.put.response.user.AlbumResponse;
-import com.example.random.interfaces.controller.put.response.user.DateListResponse;
 import com.example.random.interfaces.controller.put.response.user.RegisterResponse;
 import com.example.random.interfaces.controller.put.response.user.UserResponse;
 import com.example.random.interfaces.mq.message.UploadImgMessage;
-//import com.example.random.interfaces.mq.producer.UploadImgProducer;
 import com.example.random.interfaces.redis.message.UploadMessage;
 import com.example.random.interfaces.redis.producer.RedisQueue;
 import lombok.RequiredArgsConstructor;
-import org.bouncycastle.cms.PasswordRecipientId;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +45,6 @@ import java.io.*;
 
 import okhttp3.*;
 
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -263,6 +258,9 @@ public class LifeMomentService {
         if (files == null || ObjectUtils.isEmpty(files)) {
             throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
         }
+        redisQueue.delete(String.format("%s-uploadFile", user.getId()));
+        int num = 1;
+        int total = files.length;
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
             assert fileName != null;
@@ -270,7 +268,7 @@ public class LifeMomentService {
             String tmpFormat = tmpList.get(tmpList.size() - 1);
             try {
                 //保存文件到本地
-                File mkdir = new File("images\\tmp");
+                File mkdir = new File("/home/static/upload");
                 if (!mkdir.exists()) {
                     boolean res = mkdir.mkdirs();
                     if (res) {
@@ -278,8 +276,7 @@ public class LifeMomentService {
                     }
                 }
                 long id = System.currentTimeMillis();
-                String filePath = String.format("%s\\%s.%s", mkdir.getPath(), id, tmpFormat);
-                String tmpFilePath = String.format("%s.%s", id, tmpFormat);
+                String filePath = String.format("%s/%s.%s", "/home/static/upload", id, tmpFormat);
                 //定义输出流，将文件写入硬盘
                 FileOutputStream os = new FileOutputStream(filePath);
                 InputStream in = file.getInputStream();
@@ -292,14 +289,19 @@ public class LifeMomentService {
                 os.close();
                 UploadMessage info = new UploadMessage();
                 info.setId(id);
-                info.setPath(tmpFilePath);
+                info.setPath(filePath);
                 info.setConfigId(configId);
                 // 向消息队列写入消息
-                redisQueue.push(info.toString());
+                String jsonString = ToolsUtil.convertToJson(info);
+                redisQueue.push(jsonString);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new NewException(ErrorCodeEnum.FILE_UPLOAD_FAIL.getCode(), ErrorCodeEnum.FILE_UPLOAD_FAIL.getMsg());
             }
+            double a = (double) num / total;
+            String percentage = String.format("%.2f", a);
+            redisQueue.setValue(String.format("%s-uploadFile", user.getId()), percentage, 0);
+            num++;
         }
         LogInfoRequest param = new LogInfoRequest();
         param.setAction("upload-image");
@@ -387,5 +389,26 @@ public class LifeMomentService {
             e.printStackTrace();
             throw new NewException(ErrorCodeEnum.UN_SUPPORT_IMAGE_TYPE.getCode(), ErrorCodeEnum.UN_SUPPORT_IMAGE_TYPE.getMsg());
         }
+    }
+
+    public Integer progress()  {
+        UserInfo user = TokenUtil.getCurrentUser();
+        assert user != null;
+        String value =  redisQueue.getValue(String.format("%s-uploadFile", user.getId()));
+        if (Objects.isNull(value)) {
+            return 0;
+        }
+        double percentage = Double.parseDouble(value) * 100;
+        if (percentage == 100) {
+            redisQueue.delete(String.format("%s-uploadFile", user.getId()));
+        }
+        return (int) percentage;
+    }
+
+    public Boolean cleanRedis() {
+        UserInfo user = TokenUtil.getCurrentUser();
+        assert user != null;
+        redisQueue.delete(String.format("%s-uploadFile", user.getId()));
+        return true;
     }
 }
