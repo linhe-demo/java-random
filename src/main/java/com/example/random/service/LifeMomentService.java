@@ -300,7 +300,7 @@ public class LifeMomentService {
             }
             double a = (double) num / total;
             String percentage = String.format("%.2f", a);
-            redisQueue.setValue(String.format("%s-uploadFile", user.getId()), percentage, 0);
+            redisQueue.setValue(String.format("%s-uploadFile", user.getId()), percentage, 300);
             num++;
         }
         LogInfoRequest param = new LogInfoRequest();
