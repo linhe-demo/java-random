@@ -18,4 +18,9 @@ public class LifeResponse {
      * 文案
      */
     private String text;
+
+    /**
+     * 记录id
+     */
+    private Integer id;
 }

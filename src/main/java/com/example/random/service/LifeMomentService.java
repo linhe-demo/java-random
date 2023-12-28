@@ -18,6 +18,7 @@ import com.example.random.interfaces.client.vo.request.LogInfoRequest;
 import com.example.random.interfaces.client.vo.response.ImageInfoResponse;
 import com.example.random.interfaces.controller.put.request.album.AlbumConfigAddRequest;
 import com.example.random.interfaces.controller.put.request.life.LifeRequest;
+import com.example.random.interfaces.controller.put.request.life.RemovePictureRequest;
 import com.example.random.interfaces.controller.put.request.user.AlbumListRequest;
 import com.example.random.interfaces.controller.put.request.user.DateListRequest;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
@@ -98,6 +99,7 @@ public class LifeMomentService {
                 LifeResponse info = new LifeResponse();
                 info.setImgUrl(CommonEnum.IMAGE_FILE_PATH.getValue() + i.getImgUrl());
                 info.setText(i.getText());
+                info.setId(i.getId());
                 list.add(info);
             });
         }
@@ -291,6 +293,7 @@ public class LifeMomentService {
                 info.setId(id);
                 info.setPath(filePath);
                 info.setConfigId(configId);
+                info.setAction("add-image");
                 // 向消息队列写入消息
                 String jsonString = ToolsUtil.convertToJson(info);
                 redisQueue.push(jsonString);
@@ -392,10 +395,10 @@ public class LifeMomentService {
         }
     }
 
-    public Integer progress()  {
+    public Integer progress() {
         UserInfo user = TokenUtil.getCurrentUser();
         assert user != null;
-        String value =  redisQueue.getValue(String.format("%s-uploadFile", user.getId()));
+        String value = redisQueue.getValue(String.format("%s-uploadFile", user.getId()));
         if (Objects.isNull(value)) {
             return 0;
         }
@@ -410,6 +413,43 @@ public class LifeMomentService {
         UserInfo user = TokenUtil.getCurrentUser();
         assert user != null;
         redisQueue.delete(String.format("%s-uploadFile", user.getId()));
+        return true;
+    }
+
+    public Boolean removePicture(RemovePictureRequest request, HttpServletRequest ip) {
+        UserInfo user = TokenUtil.getCurrentUser();
+        assert user != null;
+        //检查当前图片是否属于该账户
+        LifeConfig info = lifeConfigRepository.getConfigById(request.getId());
+        if (Objects.isNull(info)) {
+            throw new NewException(ErrorCodeEnum.CONFIG_NOT_FOUND.getCode(), ErrorCodeEnum.CONFIG_NOT_FOUND.getMsg());
+        }
+        Integer configId = info.getConfigId();
+        AlbumConfig config = albumConfigRepository.getAlbumConfigById(configId);
+        if (Objects.isNull(config)) {
+            throw new NewException(ErrorCodeEnum.CONFIG_NOT_FOUND.getCode(), ErrorCodeEnum.CONFIG_NOT_FOUND.getMsg());
+        }
+        if (!Objects.equals(user.getPersonAlbumId(), config.getPersonAlbumId())) {
+            throw new NewException(ErrorCodeEnum.USER_NOT_PERMISSION.getCode(), ErrorCodeEnum.USER_NOT_PERMISSION.getMsg());
+        }
+        UploadMessage saveInfo = new UploadMessage();
+        saveInfo.setId(Long.valueOf(request.getId()));
+        saveInfo.setAction("remove-image");
+        saveInfo.setPath(info.getImgUrl());
+        // 向消息队列写入消息
+        String jsonString = ToolsUtil.convertToJson(info);
+        redisQueue.push(jsonString);
+
+        // 将表中的数据移除
+        lifeConfigRepository.removePictureById(request.getId());
+
+        //记录日志
+        LogInfoRequest param = new LogInfoRequest();
+        param.setAction(String.format("remove-image id: %s", request.getId()));
+        param.setActionUser(Objects.requireNonNull(user).getUserName());
+        param.setIp(ToolsUtil.getIp(ip));
+        logClient.saveLogInfo(param);
+
         return true;
     }
 }

@@ -9,4 +9,6 @@ public class UploadMessage {
     private Long id;
 
     private Integer configId;
+
+    private String action;
 }

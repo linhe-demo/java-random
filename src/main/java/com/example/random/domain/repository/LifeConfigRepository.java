@@ -26,4 +26,8 @@ public interface LifeConfigRepository {
      * @param id   相册id
      */
     void SaveInfo(String path, Integer id);
+
+    LifeConfig getConfigById(Integer id);
+
+    void removePictureById(Integer id);
 }

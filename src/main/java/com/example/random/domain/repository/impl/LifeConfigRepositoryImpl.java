@@ -37,4 +37,15 @@ public class LifeConfigRepositoryImpl implements LifeConfigRepository {
         info.setImgUrl(path);
         lifeConfigMapper.insert(info);
     }
+
+    @Override
+    public LifeConfig getConfigById(Integer id) {
+        return lifeConfigMapper.selectOne(Wrappers.<LifeConfig>lambdaQuery()
+                .eq(LifeConfig::getId, id));
+    }
+
+    @Override
+    public void removePictureById(Integer id) {
+        lifeConfigMapper.deleteById(id);
+    }
 }

@@ -7,6 +7,7 @@ import com.example.random.domain.output.ApiResponse;
 import com.example.random.interfaces.constant.Path;
 import com.example.random.interfaces.controller.put.request.album.AlbumConfigAddRequest;
 import com.example.random.interfaces.controller.put.request.life.LifeRequest;
+import com.example.random.interfaces.controller.put.request.life.RemovePictureRequest;
 import com.example.random.interfaces.controller.put.request.user.AlbumListRequest;
 import com.example.random.interfaces.controller.put.request.user.DateListRequest;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
@@ -61,6 +62,12 @@ public class LifeMomentController {
     @PostMapping("album/list")
     public ResponseEntity<ApiResponse<List<AlbumResponse>>> AlbumList(@RequestBody AlbumListRequest request, HttpServletRequest ip) {
         return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.getAlbumList(request, ip)));
+    }
+
+    @UserLoginToken
+    @PostMapping("remove/image")
+    public ResponseEntity<ApiResponse<Boolean>> removePicture(@RequestBody RemovePictureRequest request, HttpServletRequest ip) {
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.removePicture(request, ip)));
     }
 
     @UserLoginToken
