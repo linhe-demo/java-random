@@ -437,7 +437,7 @@ public class LifeMomentService {
         saveInfo.setAction("remove-image");
         saveInfo.setPath(info.getImgUrl());
         // 向消息队列写入消息
-        String jsonString = ToolsUtil.convertToJson(info);
+        String jsonString = ToolsUtil.convertToJson(saveInfo);
         redisQueue.push(jsonString);
 
         // 将表中的数据移除
