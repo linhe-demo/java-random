@@ -12,6 +12,7 @@ import com.example.random.domain.repository.DateListRepository;
 import com.example.random.domain.repository.LifeConfigRepository;
 import com.example.random.domain.repository.UserInfoRepository;
 import com.example.random.domain.utils.*;
+import com.example.random.domain.value.CalendarInfo;
 import com.example.random.domain.value.RedisInfo;
 import com.example.random.interfaces.client.LogClient;
 import com.example.random.interfaces.client.vo.request.LogInfoRequest;
@@ -26,6 +27,7 @@ import com.example.random.interfaces.controller.put.request.user.UserRequest;
 import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeResponse;
 import com.example.random.interfaces.controller.put.response.user.AlbumResponse;
+import com.example.random.interfaces.controller.put.response.user.CalendarResponse;
 import com.example.random.interfaces.controller.put.response.user.RegisterResponse;
 import com.example.random.interfaces.controller.put.response.user.UserResponse;
 import com.example.random.interfaces.mq.message.UploadImgMessage;
@@ -50,6 +52,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -451,5 +454,12 @@ public class LifeMomentService {
         logClient.saveLogInfo(param);
 
         return true;
+    }
+
+    public CalendarResponse getDate() {
+        CalendarInfo dateInfo = LunarCalendarUtils.getCurrentDate();
+        CalendarResponse backInfo = new CalendarResponse();
+        BeanCopierUtil.copy(dateInfo, backInfo);
+        return backInfo;
     }
 }

@@ -14,10 +14,7 @@ import com.example.random.interfaces.controller.put.request.user.RegisterRequest
 import com.example.random.interfaces.controller.put.request.user.UserRequest;
 import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeResponse;
-import com.example.random.interfaces.controller.put.response.user.AlbumResponse;
-import com.example.random.interfaces.controller.put.response.user.DateListResponse;
-import com.example.random.interfaces.controller.put.response.user.RegisterResponse;
-import com.example.random.interfaces.controller.put.response.user.UserResponse;
+import com.example.random.interfaces.controller.put.response.user.*;
 import com.example.random.service.LifeMomentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -104,6 +101,13 @@ public class LifeMomentController {
     @PostMapping("date/list")
     public ResponseEntity<ApiResponse<List<String>>> dateList(@RequestBody DateListRequest request, HttpServletRequest ip) {
         return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.dateList(request, ip)));
+    }
+
+
+    @UserLoginToken
+    @PostMapping("date/info")
+    public ResponseEntity<ApiResponse<CalendarResponse>> getDate() {
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.getDate()));
     }
 
     @PassToken
