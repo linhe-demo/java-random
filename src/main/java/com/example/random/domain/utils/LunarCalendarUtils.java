@@ -1,11 +1,13 @@
 package com.example.random.domain.utils;
 
+import cn.hutool.core.math.MathUtil;
 import com.example.random.domain.value.CalendarInfo;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -523,7 +525,7 @@ public class LunarCalendarUtils {
         this.lunarFestival = lunarFestival;
     }
 
-    public static CalendarInfo getCurrentDate(){
+    public static CalendarInfo getCurrentDate() {
         LocalDate currentDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDate = currentDate.format(formatter);
@@ -538,4 +540,23 @@ public class LunarCalendarUtils {
         backInfo.setSolarFestival(festival.getSolarFestival());
         return backInfo;
     }
+
+    public static String getMarryDays() {
+        LocalDate inputDate = LocalDate.parse("2023-11-28");
+
+        // 获取当前日期
+        LocalDate today = LocalDate.now();
+
+        // 计算年、月和天数差异
+//        long years = ChronoUnit.YEARS.between(inputDate, today);
+//        long months = ChronoUnit.MONTHS.between(inputDate, today);
+        long days = ChronoUnit.DAYS.between(inputDate, today);
+
+        long year = Math.floorDiv(days, 365);
+
+        long day = days % 365;
+
+        return String.format("我们结婚 %s%s啦", year != 0 ? year + "年" : "", day != 0 ? days + "天" : "");
+    }
+
 }

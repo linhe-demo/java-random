@@ -52,7 +52,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -198,6 +197,8 @@ public class LifeMomentService {
         assert user != null;
 
         List<AlbumConfig> list = albumConfigRepository.getAlbumConfig(user.getPersonAlbumId(), ToolsUtil.StringToDate(String.format("%s-01-01 00:00:00", request.getDate())), ToolsUtil.StringToDate(String.format("%s-12-31 23:59:59", request.getDate())));
+        System.out.println(ToolsUtil.StringToDate(String.format("%s-01-01 00:00:00", request.getDate())));
+        System.out.println(ToolsUtil.StringToDate(String.format("%s-12-31 23:59:59", request.getDate())));
         final Integer[] num = {1};
         list.forEach(i -> {
             AlbumResponse albumResponse = new AlbumResponse();
@@ -457,9 +458,15 @@ public class LifeMomentService {
     }
 
     public CalendarResponse getDate() {
+        UserInfo user = TokenUtil.getCurrentUser();
+        assert user != null;
         CalendarInfo dateInfo = LunarCalendarUtils.getCurrentDate();
         CalendarResponse backInfo = new CalendarResponse();
         BeanCopierUtil.copy(dateInfo, backInfo);
+
+        if (user.getId() == 1 || user.getId() == 2) {
+            backInfo.setMarryDay(LunarCalendarUtils.getMarryDays());
+        }
         return backInfo;
     }
 }

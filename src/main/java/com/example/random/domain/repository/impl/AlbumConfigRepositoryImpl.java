@@ -24,8 +24,8 @@ public class AlbumConfigRepositoryImpl implements AlbumConfigRepository {
         return albumConfigMapper.selectList(Wrappers.<AlbumConfig>lambdaQuery()
                 .eq(AlbumConfig::getStatus, 1)
                 .eq(AlbumConfig::getPersonAlbumId, id)
-                .gt(beginDate != null, AlbumConfig::getDate, beginDate)
-                .lt(endDate != null, AlbumConfig::getDate, endDate)
+                .ge(beginDate != null, AlbumConfig::getDate, beginDate)
+                .le(endDate != null, AlbumConfig::getDate, endDate)
                 .last(" order by `date` ASC "));
     }
 

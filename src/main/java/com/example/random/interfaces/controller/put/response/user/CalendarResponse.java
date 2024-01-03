@@ -27,4 +27,9 @@ public class CalendarResponse {
      * 农历节日
      */
     private String lunarFestival;
+
+    /**
+     * 结婚天数
+     */
+    private String marryDay;
 }
