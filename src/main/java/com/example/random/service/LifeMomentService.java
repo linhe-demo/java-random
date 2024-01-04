@@ -34,8 +34,6 @@ import com.example.random.interfaces.mq.message.UploadImgMessage;
 import com.example.random.interfaces.redis.message.UploadMessage;
 import com.example.random.interfaces.redis.producer.RedisQueue;
 import lombok.RequiredArgsConstructor;
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -67,7 +65,6 @@ public class LifeMomentService {
     private final AlbumConfigRepository albumConfigRepository;
     private final LogClient logClient;
     private final DateListRepository dateListRepository;
-    private final RedissonClient redissonClient;
 
     @Autowired
     private RedisQueue redisQueue;
@@ -159,8 +156,7 @@ public class LifeMomentService {
             redisInfo.setTime(new Date());
             redisInfo.setToken(token);
             redisInfo.setUserName(userInfo.getUserName());
-            RBucket<String> bucket = redissonClient.getBucket(String.format("%s-linHeDemo", userInfo.getId()));
-            bucket.set(ToolsUtil.convertToJson(redisInfo));
+            redisQueue.setValue(String.format("%s-linHeDemo", userInfo.getId()), ToolsUtil.convertToJson(redisInfo), 0);
             backInfo.setExpiredTime(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + 86400 * 7);
             backInfo.setNickname(userInfo.getNickname());
             backInfo.setToken(token);
@@ -220,7 +216,7 @@ public class LifeMomentService {
     public Boolean autoLogin(HttpServletRequest ip) {
         UserInfo user = TokenUtil.getCurrentUser();
         //检查缓存中是否存在用户登录信息
-        RBucket<String> bucket = redissonClient.getBucket(String.format("%s-linHeDemo", Objects.requireNonNull(user).getId()));
+        String bucket = redisQueue.getValue(String.format("%s-linHeDemo", Objects.requireNonNull(user).getId()));
 
         LogInfoRequest param = new LogInfoRequest();
         param.setAction("auto-login");

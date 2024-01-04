@@ -12,8 +12,8 @@ import com.example.random.domain.entity.UserInfo;
 import com.example.random.domain.repository.UserInfoRepository;
 import com.example.random.domain.utils.ToolsUtil;
 import com.example.random.domain.value.RedisInfo;
+import com.example.random.interfaces.redis.producer.RedisQueue;
 import org.jetbrains.annotations.NotNull;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -38,7 +38,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     @Autowired
     private  UserInfoRepository userInfoRepository;
     @Autowired
-    private  RedissonClient redissonClient;
+    private RedisQueue redisQueue;
 
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object object) {
@@ -81,7 +81,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 }
 
                 //检查用户是token是否过期
-                String redisToken = (String) redissonClient.getBucket(String.format("%s-linHeDemo", user.getId())).get();
+                String redisToken = redisQueue.getValue(String.format("%s-linHeDemo", user.getId()));
                 if (Objects.isNull(redisToken)) {
                     throw new NewException(ErrorCodeEnum.TOKEN_HAS_EXPIRED.getCode(), ErrorCodeEnum.TOKEN_HAS_EXPIRED.getMsg());
                 }
