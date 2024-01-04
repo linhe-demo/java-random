@@ -14,9 +14,9 @@ public class RedisConfiguration {
         Config config = new Config();
 
         SingleServerConfig singleServerConfig = config.useSingleServer();
-        singleServerConfig.setAddress("redis://150.158.82.218:6379");
+        singleServerConfig.setAddress("redis://42.192.54.177:6379");
         singleServerConfig.setDatabase(0);
-        singleServerConfig.setPassword("yuqicong20230424");
+        singleServerConfig.setPassword("");
         singleServerConfig.setConnectionMinimumIdleSize(10);
 
         return Redisson.create(config);

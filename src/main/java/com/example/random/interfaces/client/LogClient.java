@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @author muhe
  * @date 2023-08-02
  */
-@FeignClient(name = "LogClient", url = "http://150.158.82.218:9999/")
+@FeignClient(name = "LogClient", url = "http://42.192.54.177:9999/")
 public interface LogClient {
     @PostMapping(path = "log/save", consumes = "application/json")
     String saveLogInfo(@RequestBody LogInfoRequest request);
