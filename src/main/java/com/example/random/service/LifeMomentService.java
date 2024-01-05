@@ -12,6 +12,7 @@ import com.example.random.domain.repository.DateListRepository;
 import com.example.random.domain.repository.LifeConfigRepository;
 import com.example.random.domain.repository.UserInfoRepository;
 import com.example.random.domain.utils.*;
+import com.example.random.domain.utils.calendar.CalendarUtil;
 import com.example.random.domain.value.CalendarInfo;
 import com.example.random.domain.value.RedisInfo;
 import com.example.random.interfaces.client.LogClient;
@@ -156,7 +157,7 @@ public class LifeMomentService {
             redisInfo.setTime(new Date());
             redisInfo.setToken(token);
             redisInfo.setUserName(userInfo.getUserName());
-            redisQueue.setValue(String.format("%s-linHeDemo", userInfo.getId()), ToolsUtil.convertToJson(redisInfo), 0);
+            redisQueue.setValue(String.format("%s-linHeDemo", userInfo.getId()), ToolsUtil.convertToJson(redisInfo), 86400 * 7);
             backInfo.setExpiredTime(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + 86400 * 7);
             backInfo.setNickname(userInfo.getNickname());
             backInfo.setToken(token);
@@ -456,12 +457,12 @@ public class LifeMomentService {
     public CalendarResponse getDate() {
         UserInfo user = TokenUtil.getCurrentUser();
         assert user != null;
-        CalendarInfo dateInfo = LunarCalendarUtils.getCurrentDate();
+        CalendarInfo dateInfo = CalendarUtil.getCurrentDate();
         CalendarResponse backInfo = new CalendarResponse();
         BeanCopierUtil.copy(dateInfo, backInfo);
 
         if (user.getId() == 1 || user.getId() == 2) {
-            backInfo.setMarryDay(LunarCalendarUtils.getMarryDays());
+            backInfo.setMarryDay(CalendarUtil.getMarryDays());
         }
         return backInfo;
     }
