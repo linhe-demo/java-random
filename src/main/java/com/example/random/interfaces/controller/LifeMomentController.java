@@ -13,6 +13,7 @@ import com.example.random.interfaces.controller.put.request.user.DateListRequest
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
 import com.example.random.interfaces.controller.put.request.user.UserRequest;
 import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
+import com.example.random.interfaces.controller.put.response.life.LifeFellingResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeResponse;
 import com.example.random.interfaces.controller.put.response.user.*;
 import com.example.random.service.LifeMomentService;
@@ -114,5 +115,11 @@ public class LifeMomentController {
     @PostMapping("test")
     public ResponseEntity<ApiResponse<Boolean>> test() {
         return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.test()));
+    }
+
+    @UserLoginToken
+    @PostMapping("life/felling")
+    public ResponseEntity<ApiResponse<List<LifeFellingResponse>>> felling() {
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.felling()));
     }
 }

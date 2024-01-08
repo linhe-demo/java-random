@@ -3,10 +3,7 @@ package com.example.random.service;
 import com.example.random.domain.common.exception.NewException;
 import com.example.random.domain.common.support.ErrorCodeEnum;
 import com.example.random.domain.constant.CommonEnum;
-import com.example.random.domain.entity.AlbumConfig;
-import com.example.random.domain.entity.DateConfig;
-import com.example.random.domain.entity.LifeConfig;
-import com.example.random.domain.entity.UserInfo;
+import com.example.random.domain.entity.*;
 import com.example.random.domain.repository.AlbumConfigRepository;
 import com.example.random.domain.repository.DateListRepository;
 import com.example.random.domain.repository.LifeConfigRepository;
@@ -26,6 +23,7 @@ import com.example.random.interfaces.controller.put.request.user.DateListRequest
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
 import com.example.random.interfaces.controller.put.request.user.UserRequest;
 import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
+import com.example.random.interfaces.controller.put.response.life.LifeFellingResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeResponse;
 import com.example.random.interfaces.controller.put.response.user.AlbumResponse;
 import com.example.random.interfaces.controller.put.response.user.CalendarResponse;
@@ -464,6 +462,25 @@ public class LifeMomentService {
         if (user.getId() == 1 || user.getId() == 2) {
             backInfo.setMarryDay(CalendarUtil.getMarryDays());
         }
+        return backInfo;
+    }
+
+    public List<LifeFellingResponse> felling() {
+        UserInfo user = TokenUtil.getCurrentUser();
+        assert user != null;
+        List<FellingData> feelings = lifeConfigRepository.getUserFeeling(user.getPersonAlbumId());
+        if (CollectionUtils.isEmpty(feelings)) {
+            return new ArrayList<>();
+        }
+        List<LifeFellingResponse> backInfo = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/M/d");
+        feelings.forEach(i -> {
+            LifeFellingResponse tmp = new LifeFellingResponse();
+            tmp.setTitle(i.getTitle());
+            tmp.setText(i.getText());
+            tmp.setDate(dateFormat.format(i.getCreateTime()));
+            backInfo.add(tmp);
+        });
         return backInfo;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.random.domain.repository;
 
+import com.example.random.domain.entity.FellingData;
 import com.example.random.domain.entity.LifeConfig;
 
 import java.util.List;
@@ -30,4 +31,7 @@ public interface LifeConfigRepository {
     LifeConfig getConfigById(Integer id);
 
     void removePictureById(Integer id);
+
+
+    List<FellingData> getUserFeeling(Long personAlbumId);
 }

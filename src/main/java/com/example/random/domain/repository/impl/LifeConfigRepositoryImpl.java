@@ -1,9 +1,12 @@
 package com.example.random.domain.repository.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.random.domain.common.support.StatusEnum;
+import com.example.random.domain.entity.FellingData;
 import com.example.random.domain.entity.LifeConfig;
 import com.example.random.domain.repository.LifeConfigRepository;
 import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
+import com.example.random.interfaces.mapper.FellingDataMapper;
 import com.example.random.interfaces.mapper.LifeConfigMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -15,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LifeConfigRepositoryImpl implements LifeConfigRepository {
     private final LifeConfigMapper lifeConfigMapper;
+    private final FellingDataMapper fellingDataMapper;
 
     @Override
     public List<LifeConfig> getLifeConfigData(Integer id) {
@@ -47,5 +51,13 @@ public class LifeConfigRepositoryImpl implements LifeConfigRepository {
     @Override
     public void removePictureById(Integer id) {
         lifeConfigMapper.deleteById(id);
+    }
+
+    @Override
+    public List<FellingData> getUserFeeling(Long personAlbumId) {
+        return fellingDataMapper.selectList(Wrappers.<FellingData>lambdaQuery()
+                .eq(FellingData::getPersonId, personAlbumId)
+                .eq(FellingData::getStatus, StatusEnum.STATUS_ON.getCode())
+                .orderByAsc(FellingData::getCreateTime));
     }
 }
