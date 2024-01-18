@@ -6,6 +6,7 @@ import com.example.random.annotation.UserLoginToken;
 import com.example.random.domain.output.ApiResponse;
 import com.example.random.interfaces.constant.Path;
 import com.example.random.interfaces.controller.put.request.album.AlbumConfigAddRequest;
+import com.example.random.interfaces.controller.put.request.life.FellingRequest;
 import com.example.random.interfaces.controller.put.request.life.LifeRequest;
 import com.example.random.interfaces.controller.put.request.life.RemovePictureRequest;
 import com.example.random.interfaces.controller.put.request.user.AlbumListRequest;
@@ -121,5 +122,11 @@ public class LifeMomentController {
     @PostMapping("life/felling")
     public ResponseEntity<ApiResponse<List<LifeFellingResponse>>> felling() {
         return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.felling()));
+    }
+
+    @UserLoginToken
+    @PostMapping("felling/save")
+    public ResponseEntity<ApiResponse<Boolean>> addFelling(@RequestBody FellingRequest request, HttpServletRequest ip) {
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.addFelling(request, ip)));
     }
 }

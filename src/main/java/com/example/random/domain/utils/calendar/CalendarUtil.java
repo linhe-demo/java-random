@@ -1,6 +1,7 @@
 package com.example.random.domain.utils.calendar;
 
 import com.example.random.domain.value.CalendarInfo;
+import org.apache.logging.log4j.util.Strings;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,9 +28,15 @@ public class CalendarUtil {
         CalendarInfo backInfo = new CalendarInfo();
         backInfo.setSolarDate(String.format("公历：%s %s", c.getDay(ca), c.getWeek(ca)));
         backInfo.setLunarDate(String.format("农历：%s【%s】年 %s", c.cyclical(), c.animalsYear(), c.getDay()));
-        backInfo.setLunarTerm(s.getSolartermsMsg());
-        backInfo.setLunarFestival(CalendarUtil.getLunarDay());
-        backInfo.setSolarFestival(gre.getGremessage());
+        if (!Strings.isEmpty(s.getSolartermsMsg())) {
+            backInfo.setLunarTerm(String.format("二十四节气：%s", s.getSolartermsMsg()));
+        }
+        if (!Strings.isEmpty(CalendarUtil.getLunarDay())) {
+            backInfo.setLunarFestival(String.format("农历节日：%s", CalendarUtil.getLunarDay()));
+        }
+        if (!Strings.isEmpty(gre.getGremessage())) {
+            backInfo.setLunarFestival(String.format("阳历节日：%s", gre.getGremessage()));
+        }
         return backInfo;
     }
 

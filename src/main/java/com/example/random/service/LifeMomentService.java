@@ -16,6 +16,7 @@ import com.example.random.interfaces.client.LogClient;
 import com.example.random.interfaces.client.vo.request.LogInfoRequest;
 import com.example.random.interfaces.client.vo.response.ImageInfoResponse;
 import com.example.random.interfaces.controller.put.request.album.AlbumConfigAddRequest;
+import com.example.random.interfaces.controller.put.request.life.FellingRequest;
 import com.example.random.interfaces.controller.put.request.life.LifeRequest;
 import com.example.random.interfaces.controller.put.request.life.RemovePictureRequest;
 import com.example.random.interfaces.controller.put.request.user.AlbumListRequest;
@@ -482,5 +483,24 @@ public class LifeMomentService {
             backInfo.add(tmp);
         });
         return backInfo;
+    }
+
+    public Boolean addFelling(FellingRequest request, HttpServletRequest ip) {
+        UserInfo user = TokenUtil.getCurrentUser();
+        assert user != null;
+        if (request.getTitle().isEmpty()) {
+            throw new NewException(ErrorCodeEnum.TITLE_NOT_EMPTY.getCode(), ErrorCodeEnum.TITLE_NOT_EMPTY.getMsg());
+        }
+        if (request.getFellingText().isEmpty()) {
+            throw new NewException(ErrorCodeEnum.CONTENT_NOT_EMPTY.getCode(), ErrorCodeEnum.CONTENT_NOT_EMPTY.getMsg());
+        }
+        lifeConfigRepository.saveFelling(request, user.getPersonAlbumId());
+        LogInfoRequest param = new LogInfoRequest();
+        param.setAction("add-felling");
+        param.setActionUser(Objects.requireNonNull(user).getUserName());
+        param.setIp(ToolsUtil.getIp(ip));
+        //记录日志
+        logClient.saveLogInfo(param);
+        return true;
     }
 }

@@ -47,7 +47,7 @@ public class FellingData implements Serializable {
     /**
      * 启用状态 1：未启用 2: 启用
      */
-    private Byte status;
+    private Integer status;
 
     /**
      * 创建时间

@@ -34,7 +34,9 @@ public enum ErrorCodeEnum implements CodeAndMsg {
     WITHOUT_PERMISSION(10019, "您没有群贤查看该相册！"),
     FAIL_CREATE_FILE(10020, "文件夹创建失败！"),
     CONFIG_NOT_FOUND(10021, "配置不存在！"),
-    USER_NOT_PERMISSION(10022, "用户没有权限操作！")
+    USER_NOT_PERMISSION(10022, "用户没有权限操作！"),
+    TITLE_NOT_EMPTY(10023, "标题不能为空！"),
+    CONTENT_NOT_EMPTY(10024, "内容不能为空！"),
     ;
     private Integer code;
     private String msg;

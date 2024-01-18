@@ -2,6 +2,7 @@ package com.example.random.domain.repository;
 
 import com.example.random.domain.entity.FellingData;
 import com.example.random.domain.entity.LifeConfig;
+import com.example.random.interfaces.controller.put.request.life.FellingRequest;
 
 import java.util.List;
 
@@ -34,4 +35,6 @@ public interface LifeConfigRepository {
 
 
     List<FellingData> getUserFeeling(Long personAlbumId);
+
+    void saveFelling(FellingRequest request, Long id);
 }
