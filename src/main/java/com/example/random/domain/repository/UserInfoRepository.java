@@ -1,6 +1,7 @@
 package com.example.random.domain.repository;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.example.random.domain.entity.DateConfig;
 import com.example.random.domain.entity.UserInfo;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
 
@@ -27,7 +28,7 @@ public interface UserInfoRepository {
      *
      * @param request 用户注册信息
      */
-    void saveUserInfo(RegisterRequest request);
+    Long saveUserInfo(RegisterRequest request);
 
     /**
      * 根据用户ID 更新用户信息

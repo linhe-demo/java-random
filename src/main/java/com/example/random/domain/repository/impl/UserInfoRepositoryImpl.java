@@ -31,7 +31,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
     }
 
     @Override
-    public void saveUserInfo(RegisterRequest request) {
+    public Long saveUserInfo(RegisterRequest request) {
         UserInfo user = new UserInfo();
         user.setUserName(request.getUserName());
         user.setPassword(MD5Util.getMD5(request.getPassWord()));
@@ -40,6 +40,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
         user.setClearCode(request.getPassWord());
         user.setCreateTime(new Date());
         userInfoMapper.insert(user);
+        return user.getPersonAlbumId();
     }
 
     @Override

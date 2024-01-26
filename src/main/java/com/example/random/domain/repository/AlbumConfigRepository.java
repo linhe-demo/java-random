@@ -1,6 +1,7 @@
 package com.example.random.domain.repository;
 
 import com.example.random.domain.entity.AlbumConfig;
+import com.example.random.domain.entity.DateConfig;
 
 import java.time.LocalDate;
 import java.util.Date;

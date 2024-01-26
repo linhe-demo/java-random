@@ -34,6 +34,7 @@ import com.example.random.interfaces.mq.message.UploadImgMessage;
 import com.example.random.interfaces.redis.message.UploadMessage;
 import com.example.random.interfaces.redis.producer.RedisQueue;
 import lombok.RequiredArgsConstructor;
+import net.sf.jsqlparser.expression.StringValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -176,7 +178,10 @@ public class LifeMomentService {
         }
 
         //保存用户账号信息
-        userInfoRepository.saveUserInfo(request);
+        Long id = userInfoRepository.saveUserInfo(request);
+        int year = LocalDate.now().getYear();
+        //初始化用户相册数据
+        dateListRepository.save(id, String.valueOf(year));
         //记录日志
         LogInfoRequest param = new LogInfoRequest();
         param.setAction("register");

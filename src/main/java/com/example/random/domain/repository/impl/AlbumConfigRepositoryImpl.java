@@ -4,6 +4,7 @@ package com.example.random.domain.repository.impl;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.random.domain.entity.AlbumConfig;
+import com.example.random.domain.entity.DateConfig;
 import com.example.random.domain.repository.AlbumConfigRepository;
 import com.example.random.interfaces.mapper.AlbumConfigMapper;
 import lombok.RequiredArgsConstructor;
