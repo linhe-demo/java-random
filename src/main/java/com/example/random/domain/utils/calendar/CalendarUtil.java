@@ -12,7 +12,7 @@ import java.util.Date;
 
 public class CalendarUtil {
 
-    public static String getLunarDay(){
+    public static String getLunarDay() {
         Calendar ca = Calendar.getInstance();
         SolarTermsUtil s = new SolarTermsUtil(ca);
         CalendarUtil c = new CalendarUtil(ca);
@@ -22,9 +22,9 @@ public class CalendarUtil {
 
     public static CalendarInfo getCurrentDate() {
         Calendar ca = Calendar.getInstance();
-        SolarTermsUtil s=new SolarTermsUtil(ca);
-        CalendarUtil c=new CalendarUtil(ca);
-        GregorianUtil gre=new GregorianUtil(ca);
+        SolarTermsUtil s = new SolarTermsUtil(ca);
+        CalendarUtil c = new CalendarUtil(ca);
+        GregorianUtil gre = new GregorianUtil(ca);
         CalendarInfo backInfo = new CalendarInfo();
         backInfo.setSolarDate(String.format("公历：%s %s", c.getDay(ca), c.getWeek(ca)));
         backInfo.setLunarDate(String.format("农历：%s【%s】年 %s", c.cyclical(), c.animalsYear(), c.getDay()));
@@ -411,6 +411,10 @@ public class CalendarUtil {
             message = "重阳";
         } else if ((month == 12) && day == 8) {
             message = "腊八";
+        } else if ((month == 12) && day == 23) {
+            message = "北方小年";
+        } else if ((month == 12) && day == 24) {
+            message = "南方小年";
         } else {
             if (month == 12) {
                 if ((((monthDays(year, month) == 29) && day == 29))
