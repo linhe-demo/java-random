@@ -14,9 +14,9 @@ public class CalendarUtil {
 
     public static String getLunarDay() {
         Calendar ca = Calendar.getInstance();
-        SolarTermsUtil s = new SolarTermsUtil(ca);
+//        SolarTermsUtil s = new SolarTermsUtil(ca);
         CalendarUtil c = new CalendarUtil(ca);
-        GregorianUtil gre = new GregorianUtil(ca);
+//        GregorianUtil gre = new GregorianUtil(ca);
         return c.getChinaCalendarMsg(c.lunarYear, c.lunarMonth, c.lunarDay);
     }
 
@@ -41,13 +41,27 @@ public class CalendarUtil {
     }
 
 
-    public static String getMarryDays() {
+    /**
+     * long years = ChronoUnit.YEARS.between(inputDate, today);
+     * long months = ChronoUnit.MONTHS.between(inputDate, today);
+     *
+     */
+    public static String getTimeApart(String $target) {
         LocalDate inputDate = LocalDate.parse("2023-11-28");
         // 获取当前日期
         LocalDate today = LocalDate.now();
         // 计算年、月和天数差异
-        long years = ChronoUnit.YEARS.between(inputDate, today);
-        long months = ChronoUnit.MONTHS.between(inputDate, today);
+        long days = ChronoUnit.DAYS.between(inputDate, today);
+        long year = Math.floorDiv(days, 365);
+        long day = days % 365;
+        return String.format("我们结婚 %s%s啦", year != 0 ? year + "年" : "", day != 0 ? days + "天" : "");
+    }
+
+    public static String getFirstMeetingDays() {
+        LocalDate inputDate = LocalDate.parse("2022-01-30");
+        // 获取当前日期
+        LocalDate today = LocalDate.now();
+        // 计算年、月和天数差异
         long days = ChronoUnit.DAYS.between(inputDate, today);
         long year = Math.floorDiv(days, 365);
         long day = days % 365;
@@ -211,8 +225,6 @@ public class CalendarUtil {
      * 传出y年m月d日对应的农历. yearCyl3:农历年与1864的相差数 ? monCyl4:从1900年1月31日以来,闰月数
      * dayCyl5:与1900年1月31日相差的天数,再加40 ?
      *
-     * @param cal
-     * @return
      */
     public CalendarUtil(Calendar cal) {
         mCurrenCalendar = cal;
@@ -262,8 +274,6 @@ public class CalendarUtil {
             // 解除闰月
             if (isLeap && iMonth == (leapMonth + 1))
                 isLeap = false;
-            if (!isLeap) {
-            }
         }
         // offset为0时，并且刚才计算的月份是闰月，要校正
         if (offset == 0 && leapMonth > 0 && iMonth == leapMonth + 1) {
@@ -287,8 +297,6 @@ public class CalendarUtil {
     /**
      * 返化成中文格式
      *
-     * @param day
-     * @return
      */
     public static String getChinaDayString(int day) {
         String[] chineseTen = {"初", "十", "廿", "卅"};

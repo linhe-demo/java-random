@@ -466,7 +466,9 @@ public class LifeMomentService {
         BeanCopierUtil.copy(dateInfo, backInfo);
 
         if (user.getId() == 1 || user.getId() == 2) {
-            backInfo.setMarryDay(CalendarUtil.getMarryDays());
+            backInfo.setMarryDay(CalendarUtil.getTimeApart("2023-11-28"));
+            backInfo.setFirstMeeting(CalendarUtil.getTimeApart("2022-01-30"));
+            backInfo.setCertificateDay(CalendarUtil.getTimeApart("2023-04-04"));
         }
         return backInfo;
     }

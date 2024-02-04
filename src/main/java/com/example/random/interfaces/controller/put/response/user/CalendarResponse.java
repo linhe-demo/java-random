@@ -32,4 +32,16 @@ public class CalendarResponse {
      * 结婚天数
      */
     private String marryDay;
+
+    /**
+     * 第一次见面到现在的天数
+     */
+    private String firstMeeting;
+
+    /**
+     * 领证到现在的天数
+     */
+    private String certificateDay;
+
+
 }
