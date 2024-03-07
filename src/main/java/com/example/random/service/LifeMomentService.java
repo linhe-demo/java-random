@@ -158,8 +158,8 @@ public class LifeMomentService {
             redisInfo.setTime(new Date());
             redisInfo.setToken(token);
             redisInfo.setUserName(userInfo.getUserName());
-            redisQueue.setValue(String.format("%s-linHeDemo", userInfo.getId()), ToolsUtil.convertToJson(redisInfo), 86400 * 7);
-            backInfo.setExpiredTime(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + 86400 * 7);
+            redisQueue.setValue(String.format("%s-linHeDemo", userInfo.getId()), ToolsUtil.convertToJson(redisInfo), 86400 * 365);
+            backInfo.setExpiredTime(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) + 86400 * 365);
             backInfo.setNickname(userInfo.getNickname());
             backInfo.setToken(token);
             //更新用户最近一次登录时间
@@ -176,7 +176,6 @@ public class LifeMomentService {
         if (!ObjectUtils.isEmpty(userInfo)) {
             throw new NewException(ErrorCodeEnum.USER_ALREADY_EXISTS.getCode(), ErrorCodeEnum.USER_ALREADY_EXISTS.getMsg());
         }
-
         //保存用户账号信息
         Long id = userInfoRepository.saveUserInfo(request);
         int year = LocalDate.now().getYear();
@@ -466,9 +465,9 @@ public class LifeMomentService {
         BeanCopierUtil.copy(dateInfo, backInfo);
 
         if (user.getId() == 1 || user.getId() == 2) {
-            backInfo.setMarryDay(CalendarUtil.getTimeApart("2023-11-28"));
-            backInfo.setFirstMeeting(CalendarUtil.getTimeApart("2022-01-30"));
-            backInfo.setCertificateDay(CalendarUtil.getTimeApart("2023-04-04"));
+            backInfo.setMarryDay(CalendarUtil.getTimeApart("结婚：","2023-11-28"));
+            backInfo.setFirstMeeting(CalendarUtil.getTimeApart("初见：","2022-01-30"));
+            backInfo.setCertificateDay(CalendarUtil.getTimeApart("领证：","2023-04-04"));
         }
         return backInfo;
     }

@@ -46,27 +46,25 @@ public class CalendarUtil {
      * long months = ChronoUnit.MONTHS.between(inputDate, today);
      *
      */
-    public static String getTimeApart(String $target) {
-        LocalDate inputDate = LocalDate.parse("2023-11-28");
+    public static String getTimeApart(String title, String target) {
+        LocalDate inputDate = LocalDate.parse(target);
         // 获取当前日期
         LocalDate today = LocalDate.now();
         // 计算年、月和天数差异
         long days = ChronoUnit.DAYS.between(inputDate, today);
         long year = Math.floorDiv(days, 365);
         long day = days % 365;
-        return String.format("我们结婚 %s%s啦", year != 0 ? year + "年" : "", day != 0 ? days + "天" : "");
+        return String.format("%s %s%s啦", title, year != 0 ? year + "年" : "", day != 0 ? day + " 天" : " ");
     }
 
-    public static String getFirstMeetingDays() {
-        LocalDate inputDate = LocalDate.parse("2022-01-30");
+    public static Long Countdown(String target) {
+        LocalDate inputDate = LocalDate.parse(target);
         // 获取当前日期
         LocalDate today = LocalDate.now();
         // 计算年、月和天数差异
-        long days = ChronoUnit.DAYS.between(inputDate, today);
-        long year = Math.floorDiv(days, 365);
-        long day = days % 365;
-        return String.format("我们结婚 %s%s啦", year != 0 ? year + "年" : "", day != 0 ? days + "天" : "");
+        return ChronoUnit.DAYS.between(today, inputDate);
     }
+
 
     /**
      * 用于保存中文的月份

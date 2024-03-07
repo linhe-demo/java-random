@@ -1,13 +1,17 @@
 package com.example.random.domain.repository.impl;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.random.domain.common.support.StatusEnum;
+import com.example.random.domain.entity.ExtensionData;
+import com.example.random.domain.entity.UserBaby;
 import com.example.random.domain.entity.UserInfo;
 import com.example.random.domain.repository.UserInfoRepository;
 import com.example.random.domain.utils.BeanCopierUtil;
 import com.example.random.domain.utils.MD5Util;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
+import com.example.random.interfaces.mapper.ExtensionDataMapper;
+import com.example.random.interfaces.mapper.UserBabyMapper;
 import com.example.random.interfaces.mapper.UserInfoMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -18,6 +22,8 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class UserInfoRepositoryImpl implements UserInfoRepository {
     private final UserInfoMapper userInfoMapper;
+    private final UserBabyMapper userBabyMapper;
+    private final ExtensionDataMapper extensionDataMapper;
 
     @Override
     @DS("composer")
@@ -37,6 +43,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
         user.setPassword(MD5Util.getMD5(request.getPassWord()));
         user.setNickname(request.getNickname());
         user.setPersonAlbumId(System.currentTimeMillis());
+        user.setStatus(StatusEnum.USER_OFF.getCode());
         user.setClearCode(request.getPassWord());
         user.setCreateTime(new Date());
         userInfoMapper.insert(user);
@@ -50,5 +57,21 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
         newUser.setLastLoginTime(new Date());
         System.out.println(new Date());
         userInfoMapper.updateById(newUser);
+    }
+
+    @Override
+    public UserBaby getBabyConfigById(long id) {
+        return userBabyMapper.selectOne(Wrappers.<UserBaby>lambdaQuery()
+                .eq(UserBaby::getPersonAlbumId, id)
+                .eq(UserBaby::getStatus, StatusEnum.BABY_OFF.getCode())
+        );
+    }
+
+    @Override
+    @DS("life")
+    public ExtensionData findDetailById(int weeks) {
+        return extensionDataMapper.selectOne(Wrappers.<ExtensionData>lambdaQuery()
+                .eq(ExtensionData::getId, weeks)
+        );
     }
 }

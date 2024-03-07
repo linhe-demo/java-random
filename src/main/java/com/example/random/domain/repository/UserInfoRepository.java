@@ -2,8 +2,12 @@ package com.example.random.domain.repository;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.example.random.domain.entity.DateConfig;
+import com.example.random.domain.entity.ExtensionData;
+import com.example.random.domain.entity.UserBaby;
 import com.example.random.domain.entity.UserInfo;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
+
+import java.util.List;
 
 @DS("composer")
 public interface UserInfoRepository {
@@ -36,4 +40,17 @@ public interface UserInfoRepository {
      * @param uid 用户uid
      */
     void updateUserById(UserInfo uid);
+
+    /**
+     * 检查用户孕育情况
+     * @param id bigint
+     * @return List<UserBaby>
+     */
+    UserBaby getBabyConfigById(long id);
+
+    /**
+     * 获取胎儿信息
+     * @param weeks ExtensionData
+     */
+    ExtensionData findDetailById(int weeks);
 }
