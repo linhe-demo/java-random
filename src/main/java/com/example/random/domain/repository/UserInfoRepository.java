@@ -1,10 +1,7 @@
 package com.example.random.domain.repository;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
-import com.example.random.domain.entity.DateConfig;
-import com.example.random.domain.entity.ExtensionData;
-import com.example.random.domain.entity.UserBaby;
-import com.example.random.domain.entity.UserInfo;
+import com.example.random.domain.entity.*;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
 
 import java.util.List;
@@ -46,11 +43,28 @@ public interface UserInfoRepository {
      * @param id bigint
      * @return List<UserBaby>
      */
-    UserBaby getBabyConfigById(long id);
+    List<UserBaby> getBabyConfigById(long id);
 
     /**
      * 获取胎儿信息
      * @param weeks ExtensionData
      */
     ExtensionData findDetailById(int weeks);
+
+    /**
+     * 保存宝宝成长记录
+     * @param personAlbumId Long
+     * @param name String
+     * @param desc String
+     * @param date String
+     * @return Integer
+     */
+    Integer saveBabyLifeInfo(Long personAlbumId, String name, String desc, String date);
+
+    /**
+     * 获取baby lie list
+     * @param personAlbumId long
+     * @return List<BabyLifeData>
+     */
+    List<BabyLifeData> getBabyLifeInfo(Long personAlbumId);
 }

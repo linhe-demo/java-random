@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * <p>
@@ -15,11 +13,11 @@ import java.util.Date;
  * </p>
  *
  * @author muhe
- * @since 2024-03-07
+ * @since 2024-03-14
  */
 @Data
-@TableName("extension_data")
-public class ExtensionData implements Serializable {
+@TableName("food_reason")
+public class FoodReason implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,27 +28,12 @@ public class ExtensionData implements Serializable {
     private Integer id;
 
     /**
-     * 数据类型 1：怀孕知识
+     * 食物类型id
      */
-    private Short type;
+    private Integer typeId;
 
     /**
-     * 数据
+     * 原因
      */
-    private String value;
-
-    /**
-     * 额外数据
-     */
-    private String extraValue;
-
-    /**
-     * 创建时间
-     */
-    private Date createDate;
-
-    /**
-     * 更新时间
-     */
-    private Date updateDate;
+    private String reason;
 }

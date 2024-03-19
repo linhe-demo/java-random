@@ -64,6 +64,11 @@ public class UserBaby implements Serializable {
     private Date birthday;
 
     /**
+     * baby 农历生日
+     */
+    private String lunarBirthday;
+
+    /**
      * baby 怀孕日期
      */
     private Date pregnancyDate;

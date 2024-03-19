@@ -10,49 +10,41 @@ import java.util.Date;
 
 /**
  * <p>
- *
+ * 
  * </p>
  *
  * @author muhe
- * @since 2023-07-21
+ * @since 2024-03-14
  */
-@TableName("life_config")
 @Data
-public class LifeConfig implements Serializable {
+@TableName("food_data")
+public class FoodData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 记录ID
+     * 记录id
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 图片配置id
+     * 食物类型
      */
-    private String configId;
-    /**
-     * 图片路由
-     */
-    private String imgUrl;
+    private Integer type;
 
     /**
-     * 文案
+     * 食物名
      */
-    private String text;
+    private String foodName;
+
     /**
-     * 启用状态 1: 未启用 2: 启用
+     * 状态 1：可吃 2：适量 3：可吃
      */
     private Integer status;
 
     /**
-     * 创建时间
+     * 记录创建时间
      */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
+    private Date createAt;
 }

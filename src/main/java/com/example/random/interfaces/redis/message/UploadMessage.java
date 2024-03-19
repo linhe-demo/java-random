@@ -8,7 +8,13 @@ public class UploadMessage {
 
     private Long id;
 
-    private Integer configId;
+    private String configId;
 
     private String action;
+
+    private String name;
+
+    private String desc;
+
+    private String date;
 }

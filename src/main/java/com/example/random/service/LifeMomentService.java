@@ -12,6 +12,7 @@ import com.example.random.domain.utils.*;
 import com.example.random.domain.utils.calendar.CalendarUtil;
 import com.example.random.domain.value.CalendarInfo;
 import com.example.random.domain.value.RedisInfo;
+import com.example.random.domain.value.UploadInfo;
 import com.example.random.interfaces.client.LogClient;
 import com.example.random.interfaces.client.vo.request.LogInfoRequest;
 import com.example.random.interfaces.client.vo.response.ImageInfoResponse;
@@ -24,6 +25,7 @@ import com.example.random.interfaces.controller.put.request.user.DateListRequest
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
 import com.example.random.interfaces.controller.put.request.user.UserRequest;
 import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
+import com.example.random.interfaces.controller.put.response.life.GoodsResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeFellingResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeResponse;
 import com.example.random.interfaces.controller.put.response.user.AlbumResponse;
@@ -56,6 +58,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 
 @Lazy
@@ -197,8 +200,6 @@ public class LifeMomentService {
         assert user != null;
 
         List<AlbumConfig> list = albumConfigRepository.getAlbumConfig(user.getPersonAlbumId(), ToolsUtil.StringToDate(String.format("%s-01-01 00:00:00", request.getDate())), ToolsUtil.StringToDate(String.format("%s-12-31 23:59:59", request.getDate())));
-        System.out.println(ToolsUtil.StringToDate(String.format("%s-01-01 00:00:00", request.getDate())));
-        System.out.println(ToolsUtil.StringToDate(String.format("%s-12-31 23:59:59", request.getDate())));
         final Integer[] num = {1};
         list.forEach(i -> {
             AlbumResponse albumResponse = new AlbumResponse();
@@ -264,52 +265,16 @@ public class LifeMomentService {
         if (files == null || ObjectUtils.isEmpty(files)) {
             throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
         }
-        redisQueue.delete(String.format("%s-uploadFile", user.getId()));
-        int num = 1;
-        int total = files.length;
-        for (MultipartFile file : files) {
-            String fileName = file.getOriginalFilename();
-            assert fileName != null;
-            List<String> tmpList = Arrays.asList(fileName.split("\\."));
-            String tmpFormat = tmpList.get(tmpList.size() - 1);
-            try {
-                //保存文件到本地
-                File mkdir = new File("/home/static/upload");
-                if (!mkdir.exists()) {
-                    boolean res = mkdir.mkdirs();
-                    if (res) {
-                        throw new NewException(ErrorCodeEnum.FAIL_CREATE_FILE.getCode(), ErrorCodeEnum.FAIL_CREATE_FILE.getMsg());
-                    }
-                }
-                long id = System.currentTimeMillis();
-                String filePath = String.format("%s/%s.%s", "/home/static/upload", id, tmpFormat);
-                //定义输出流，将文件写入硬盘
-                FileOutputStream os = new FileOutputStream(filePath);
-                InputStream in = file.getInputStream();
-                int b = 0;
-                while ((b = in.read()) != -1) { //读取文件
-                    os.write(b);
-                }
-                os.flush(); //关闭流
-                in.close();
-                os.close();
-                UploadMessage info = new UploadMessage();
-                info.setId(id);
-                info.setPath(filePath);
-                info.setConfigId(configId);
-                info.setAction("add-image");
-                // 向消息队列写入消息
-                String jsonString = ToolsUtil.convertToJson(info);
-                redisQueue.push(jsonString);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new NewException(ErrorCodeEnum.FILE_UPLOAD_FAIL.getCode(), ErrorCodeEnum.FILE_UPLOAD_FAIL.getMsg());
-            }
-            double a = (double) num / total;
-            String percentage = String.format("%.2f", a);
-            redisQueue.setValue(String.format("%s-uploadFile", user.getId()), percentage, 300);
-            num++;
-        }
+        UploadInfo uploadInfo = new UploadInfo();
+        uploadInfo.setUid(user.getId());
+        uploadInfo.setFiles(files);
+        uploadInfo.setConfigId(String.valueOf(configId));
+        uploadInfo.setAction("add-image");
+        String redisKey = String.format("%s-uploadFile", user.getId());
+        redisQueue.delete(redisKey);
+
+        ToolsUtil.UploadFile(redisQueue, uploadInfo, redisKey);
+
         LogInfoRequest param = new LogInfoRequest();
         param.setAction("upload-image");
         param.setActionUser(Objects.requireNonNull(user).getUserName());
@@ -428,7 +393,7 @@ public class LifeMomentService {
         if (Objects.isNull(info)) {
             throw new NewException(ErrorCodeEnum.CONFIG_NOT_FOUND.getCode(), ErrorCodeEnum.CONFIG_NOT_FOUND.getMsg());
         }
-        Integer configId = info.getConfigId();
+        String configId = info.getConfigId();
         AlbumConfig config = albumConfigRepository.getAlbumConfigById(configId);
         if (Objects.isNull(config)) {
             throw new NewException(ErrorCodeEnum.CONFIG_NOT_FOUND.getCode(), ErrorCodeEnum.CONFIG_NOT_FOUND.getMsg());
@@ -465,9 +430,9 @@ public class LifeMomentService {
         BeanCopierUtil.copy(dateInfo, backInfo);
 
         if (user.getId() == 1 || user.getId() == 2) {
-            backInfo.setMarryDay(CalendarUtil.getTimeApart("结婚：","2023-11-28"));
-            backInfo.setFirstMeeting(CalendarUtil.getTimeApart("初见：","2022-01-30"));
-            backInfo.setCertificateDay(CalendarUtil.getTimeApart("领证：","2023-04-04"));
+            backInfo.setMarryDay(CalendarUtil.getTimeApart("结婚：", "2023-11-28"));
+            backInfo.setFirstMeeting(CalendarUtil.getTimeApart("初见：", "2022-01-30"));
+            backInfo.setCertificateDay(CalendarUtil.getTimeApart("领证：", "2023-04-04"));
         }
         return backInfo;
     }
@@ -508,5 +473,23 @@ public class LifeMomentService {
         //记录日志
         logClient.saveLogInfo(param);
         return true;
+    }
+
+    public List<GoodsResponse> getFood() {
+        List<GoodsResponse> backInfo = new ArrayList<>();
+        UserInfo user = TokenUtil.getCurrentUser();
+        assert user != null;
+        Map<Integer, String> goodsReasonMap = lifeConfigRepository.getFoodReason().stream().collect(Collectors.toMap(FoodReason::getTypeId,
+                FoodReason::getReason,
+                (existingValue, newValue) -> existingValue));
+        List<FoodData> foods = lifeConfigRepository.getFood();
+        for (FoodData item: foods) {
+            GoodsResponse tmp = new GoodsResponse();
+            tmp.setName(item.getFoodName());
+            tmp.setLevel(item.getStatus());
+            tmp.setReason(goodsReasonMap.get(item.getType()));
+            backInfo.add(tmp);
+        }
+        return backInfo;
     }
 }

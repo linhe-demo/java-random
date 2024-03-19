@@ -1,7 +1,10 @@
 package com.example.random.interfaces.controller.put.response.user;
 
 
+import com.example.random.domain.value.BabyInfo;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class UserFeatureResponse {
@@ -45,4 +48,19 @@ public class UserFeatureResponse {
      * 孕第几周
      */
     private Integer week;
+
+    /**
+     * 注意事项
+     */
+    private String noticeValue;
+
+    /**
+     * 宝宝信息
+     */
+    private List<BabyInfo> babyInfo;
+
+    /**
+     * 是否展示能否吃按钮
+     */
+    private boolean btnStatus;
 }

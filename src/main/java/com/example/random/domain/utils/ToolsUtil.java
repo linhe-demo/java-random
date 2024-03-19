@@ -1,16 +1,24 @@
 package com.example.random.domain.utils;
 
+import com.example.random.domain.common.exception.NewException;
+import com.example.random.domain.common.support.ErrorCodeEnum;
+import com.example.random.domain.value.UploadInfo;
+import com.example.random.interfaces.redis.message.UploadMessage;
+import com.example.random.interfaces.redis.producer.RedisQueue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class ToolsUtil {
     /**
@@ -87,6 +95,9 @@ public class ToolsUtil {
     }
 
     public static Date StringToDate(String date) {
+        if (date.length() == 10) {
+            date += " 00:00:00";
+        }
         Date newDate = null;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  // 这是转换的格式，根据你实际的字符串格式进行调整
         try {
@@ -95,5 +106,80 @@ public class ToolsUtil {
             e.printStackTrace();
         }
         return newDate;
+    }
+
+    public static String DateToString(Date date, String type) {
+        if (Objects.isNull(date)) {
+            return "";
+        }
+        String model = "yyyy-MM-dd";
+        if (Objects.equals(type, "seconds")) {
+            model = "yyyy-MM-dd HH:mm:ss";
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat(model);
+        return formatter.format(date);
+    }
+
+    /**
+     * 文件上传
+     * @param redisQueue RedisQueue
+     * @param upload UploadInfo
+     */
+    public static void UploadFile(RedisQueue redisQueue, UploadInfo upload, String redisKey) {
+        redisQueue.delete(String.format("%s-uploadFile", upload.getUid()));
+        int num = 1;
+        int total = upload.getFiles().length;
+        for (MultipartFile file : upload.getFiles()) {
+            String fileName = file.getOriginalFilename();
+            assert fileName != null;
+            List<String> tmpList = Arrays.asList(fileName.split("\\."));
+            String tmpFormat = tmpList.get(tmpList.size() - 1);
+            try {
+                //保存文件到本地
+                File mkdir = new File("/home/static/upload");
+                if (!mkdir.exists()) {
+                    boolean res = mkdir.mkdirs();
+                    if (res) {
+                        throw new NewException(ErrorCodeEnum.FAIL_CREATE_FILE.getCode(), ErrorCodeEnum.FAIL_CREATE_FILE.getMsg());
+                    }
+                }
+                long id = System.currentTimeMillis();
+                String filePath = String.format("%s/%s.%s", "/home/static/upload", id, tmpFormat);
+                //定义输出流，将文件写入硬盘
+                FileOutputStream os = new FileOutputStream(filePath);
+                InputStream in = file.getInputStream();
+                int b = 0;
+                while ((b = in.read()) != -1) { //读取文件
+                    os.write(b);
+                }
+                os.flush(); //关闭流
+                in.close();
+                os.close();
+                UploadMessage info = new UploadMessage();
+                info.setId(id);
+                info.setPath(filePath);
+                info.setConfigId(upload.getConfigId());
+                info.setAction(upload.getAction());
+                if (Strings.isNotEmpty(upload.getTitle())) {
+                    info.setName(upload.getTitle());
+                }
+                if (Strings.isNotEmpty(upload.getDesc())) {
+                    info.setDesc(upload.getDesc());
+                }
+                if (Strings.isNotEmpty(upload.getTitle())) {
+                    info.setDate(upload.getDate());
+                }
+                // 向消息队列写入消息
+                String jsonString = ToolsUtil.convertToJson(info);
+                redisQueue.push(jsonString);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new NewException(ErrorCodeEnum.FILE_UPLOAD_FAIL.getCode(), ErrorCodeEnum.FILE_UPLOAD_FAIL.getMsg());
+            }
+            double a = (double) num / total;
+            String percentage = String.format("%.2f", a);
+            redisQueue.setValue(redisKey, percentage, 300);
+            num++;
+        }
     }
 }

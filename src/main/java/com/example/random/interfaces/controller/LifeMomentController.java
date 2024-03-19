@@ -14,6 +14,7 @@ import com.example.random.interfaces.controller.put.request.user.DateListRequest
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
 import com.example.random.interfaces.controller.put.request.user.UserRequest;
 import com.example.random.interfaces.controller.put.response.config.ConfigResponse;
+import com.example.random.interfaces.controller.put.response.life.GoodsResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeFellingResponse;
 import com.example.random.interfaces.controller.put.response.life.LifeResponse;
 import com.example.random.interfaces.controller.put.response.user.*;
@@ -128,5 +129,11 @@ public class LifeMomentController {
     @PostMapping("felling/save")
     public ResponseEntity<ApiResponse<Boolean>> addFelling(@RequestBody FellingRequest request, HttpServletRequest ip) {
         return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.addFelling(request, ip)));
+    }
+
+    @UserLoginToken
+    @PostMapping("life/food")
+    public ResponseEntity<ApiResponse<List<GoodsResponse>>> getFood() {
+        return ResponseEntity.ok(new ApiResponse<>(lifeMomentService.getFood()));
     }
 }

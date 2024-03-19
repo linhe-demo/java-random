@@ -19,7 +19,8 @@ public class DateListRepositoryImpl implements DateListRepository {
     @Override
     public List<DateConfig> getUserDateConfig(Long id) {
         return dateConfigMapper.selectList(Wrappers.<DateConfig>lambdaQuery()
-                .eq(DateConfig::getPersonAlbumId, id));
+                .eq(DateConfig::getPersonAlbumId, id)
+                .orderByAsc(DateConfig::getDate));
     }
 
     @Override

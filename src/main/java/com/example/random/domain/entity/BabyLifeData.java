@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -14,45 +15,42 @@ import java.util.Date;
  * </p>
  *
  * @author muhe
- * @since 2023-07-21
+ * @since 2024-03-19
  */
-@TableName("life_config")
 @Data
-public class LifeConfig implements Serializable {
+@TableName("baby_life_data")
+public class BabyLifeData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 记录ID
+     * 自增id
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 图片配置id
+     * 标题
      */
-    private String configId;
-    /**
-     * 图片路由
-     */
-    private String imgUrl;
+    private String title;
 
     /**
-     * 文案
+     * 描述
      */
     private String text;
+
     /**
-     * 启用状态 1: 未启用 2: 启用
+     * 记录时间
      */
-    private Integer status;
+    private Date date;
+
+    /**
+     * 私人相册id
+     */
+    private Long personAlbumId;
 
     /**
      * 创建时间
      */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
+    private Date createAt;
 }
