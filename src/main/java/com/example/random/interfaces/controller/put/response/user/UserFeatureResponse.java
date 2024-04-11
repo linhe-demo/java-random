@@ -63,4 +63,9 @@ public class UserFeatureResponse {
      * 是否展示能否吃按钮
      */
     private boolean btnStatus;
+
+    /**
+     * 百分比
+     */
+    private Integer percentage;
 }

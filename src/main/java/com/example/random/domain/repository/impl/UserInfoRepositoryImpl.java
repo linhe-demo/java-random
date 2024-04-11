@@ -97,6 +97,6 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
     public List<BabyLifeData> getBabyLifeInfo(Long personAlbumId) {
         return babyLifeDataMapper.selectList(Wrappers.<BabyLifeData>lambdaQuery()
                 .eq(BabyLifeData::getPersonAlbumId, personAlbumId)
-                .orderByAsc(BabyLifeData::getDate));
+                .orderByDesc(BabyLifeData::getDate));
     }
 }

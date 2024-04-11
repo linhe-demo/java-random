@@ -29,6 +29,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -57,7 +59,11 @@ public class UserService {
             List<BabyInfo> babyInfos = new ArrayList<>();
             for (UserBaby item : baby) {
                 if (Objects.equals(item.getStatus(), StatusEnum.BABY_OFF.getCode())) {
-                    backInfo.setDueDate(String.format("预产期：%s（离预产期 %s 天）", calculateExpectedDeliveryDate(item.getPregnancyDate()), CalendarUtil.Countdown(calculateExpectedDeliveryDate(item.getPregnancyDate()))));
+                    long countDown = CalendarUtil.Countdown(calculateExpectedDeliveryDate(item.getPregnancyDate()));
+                    backInfo.setDueDate(String.format("预产期：%s（离预产期 %s 天）", calculateExpectedDeliveryDate(item.getPregnancyDate()), countDown));
+                    BigDecimal bd = BigDecimal.valueOf((280.00 - countDown) / 280).setScale(2, RoundingMode.DOWN);
+                    double newNumber = bd.doubleValue();
+                    backInfo.setPercentage((int) (newNumber * 100));
                 }
                 if (!Objects.isNull(item.getPregnancyDate())) {
                     PregnantDate info = PregnancyCalculator(item.getPregnancyDate());
