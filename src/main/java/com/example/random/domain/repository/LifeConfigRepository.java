@@ -46,4 +46,6 @@ public interface LifeConfigRepository {
     List<FoodReason> getFoodReason();
 
     List<FoodData> getFood();
+
+    List<LifeConfig> getRandomByIds(List<Integer> ids);
 }

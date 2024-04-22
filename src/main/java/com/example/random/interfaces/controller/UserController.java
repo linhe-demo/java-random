@@ -9,6 +9,7 @@ import com.example.random.interfaces.controller.put.request.user.DateListRequest
 import com.example.random.interfaces.controller.put.response.user.BabyHighlightResponse;
 import com.example.random.interfaces.controller.put.response.user.BabyLifeResponse;
 import com.example.random.interfaces.controller.put.response.user.UserFeatureResponse;
+import com.example.random.interfaces.controller.put.response.user.UserImageResponse;
 import com.example.random.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -49,4 +50,9 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(userService.babyHighlight(request.getId())));
     }
 
+    @UserLoginToken
+    @PostMapping("image/list")
+    public ResponseEntity<ApiResponse<List<UserImageResponse>>> userImage() {
+        return ResponseEntity.ok(new ApiResponse<>(userService.imageList()));
+    }
 }

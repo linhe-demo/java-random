@@ -13,4 +13,6 @@ public interface AlbumConfigRepository {
     int saveAlbumConfig(String name, String desc, LocalDate date, Long id);
 
     AlbumConfig getAlbumConfigById(String configId);
+
+    List<AlbumConfig> getAlbumConfigByPersonId(long id);
 }

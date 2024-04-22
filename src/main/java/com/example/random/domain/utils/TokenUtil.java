@@ -4,6 +4,8 @@ import cn.hutool.core.date.DateUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.example.random.domain.common.exception.NewException;
+import com.example.random.domain.common.support.ErrorCodeEnum;
 import com.example.random.domain.entity.UserInfo;
 import com.example.random.domain.repository.UserInfoRepository;
 import org.springframework.stereotype.Component;
@@ -53,11 +55,12 @@ public class TokenUtil {
             if (StringUtils.isNotEmpty(token)) {
                 String userId = JWT.decode(token).getAudience().get(0);
                 return staticUserInfoRepository.getById(Integer.valueOf(userId));
+            } else {
+                throw new NewException(ErrorCodeEnum.USER_NOT_EXIST.getCode(), ErrorCodeEnum.USER_NOT_EXIST.getMsg());
             }
         } catch (Exception e) {
-            return null;
+            throw new NewException(ErrorCodeEnum.USER_INFO_ERROR.getCode(), ErrorCodeEnum.USER_INFO_ERROR.getMsg());
         }
-        return new UserInfo();
     }
 }
 

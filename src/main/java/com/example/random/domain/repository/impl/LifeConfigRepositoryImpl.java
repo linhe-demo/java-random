@@ -95,4 +95,10 @@ public class LifeConfigRepositoryImpl implements LifeConfigRepository {
     public List<FoodData> getFood() {
         return foodDataMapper.selectList(Wrappers.<FoodData>lambdaQuery());
     }
+
+    @Override
+    public List<LifeConfig> getRandomByIds(List<Integer> ids) {
+        return lifeConfigMapper.selectList(Wrappers.<LifeConfig>lambdaQuery()
+                .in(LifeConfig::getConfigId, ids));
+    }
 }

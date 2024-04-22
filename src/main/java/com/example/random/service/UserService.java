@@ -5,6 +5,7 @@ import com.example.random.domain.common.support.ErrorCodeEnum;
 import com.example.random.domain.common.support.StatusEnum;
 import com.example.random.domain.constant.CommonEnum;
 import com.example.random.domain.entity.*;
+import com.example.random.domain.repository.AlbumConfigRepository;
 import com.example.random.domain.repository.LifeConfigRepository;
 import com.example.random.domain.repository.UserInfoRepository;
 import com.example.random.domain.utils.TokenUtil;
@@ -19,6 +20,7 @@ import com.example.random.interfaces.client.vo.request.LogInfoRequest;
 import com.example.random.interfaces.controller.put.response.user.BabyHighlightResponse;
 import com.example.random.interfaces.controller.put.response.user.BabyLifeResponse;
 import com.example.random.interfaces.controller.put.response.user.UserFeatureResponse;
+import com.example.random.interfaces.controller.put.response.user.UserImageResponse;
 import com.example.random.interfaces.redis.producer.RedisQueue;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Lazy
 @Service
@@ -43,6 +46,7 @@ public class UserService {
     private final UserInfoRepository userInfoRepository;
     private final LogClient logClient;
     private final LifeConfigRepository lifeConfigRepository;
+    private final AlbumConfigRepository albumConfigRepository;
 
     @Autowired
     private RedisQueue redisQueue;
@@ -172,7 +176,6 @@ public class UserService {
 
     public Boolean babyUpload(String name, String desc, String date, MultipartFile[] files, HttpServletRequest ip) {
         UserInfo user = TokenUtil.getCurrentUser();
-        assert user != null;
         if (files == null || ObjectUtils.isEmpty(files)) {
             throw new NewException(ErrorCodeEnum.FILE_IS_EMPTY.getCode(), ErrorCodeEnum.FILE_IS_EMPTY.getMsg());
         }
@@ -236,6 +239,21 @@ public class UserService {
         });
         backInfo.setList(list);
         backInfo.setData(dataList);
+        return backInfo;
+    }
+
+    public List<UserImageResponse> imageList() {
+        List<UserImageResponse> backInfo = new ArrayList<>();
+        UserInfo user = TokenUtil.getCurrentUser();
+        List<AlbumConfig> configList = albumConfigRepository.getAlbumConfigByPersonId(user.getPersonAlbumId());
+        if (!CollectionUtils.isEmpty(configList)) {
+            List<Integer> lifeConfigId = configList.stream().map(AlbumConfig::getId).collect(Collectors.toList());
+            List<LifeConfig> lifeConfigs = lifeConfigRepository.getRandomByIds(lifeConfigId);
+            int count = Math.min(lifeConfigs.size(), 6);
+            Collections.shuffle(lifeConfigs);
+            List<LifeConfig> lifeConfigsNew = lifeConfigs.subList(0, count);
+            backInfo = lifeConfigsNew.stream().map(i -> new UserImageResponse(String.format("%s%s",  CommonEnum.IMAGE_FILE_PATH.getValue(),  i.getImgUrl()), true)).collect(Collectors.toList());
+        }
         return backInfo;
     }
 }

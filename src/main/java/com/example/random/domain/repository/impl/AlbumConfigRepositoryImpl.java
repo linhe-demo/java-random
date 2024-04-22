@@ -48,4 +48,10 @@ public class AlbumConfigRepositoryImpl implements AlbumConfigRepository {
         return albumConfigMapper.selectOne(Wrappers.<AlbumConfig>lambdaQuery()
                 .eq(AlbumConfig::getId, configId));
     }
+
+    @Override
+    public List<AlbumConfig> getAlbumConfigByPersonId(long id) {
+        return albumConfigMapper.selectList(Wrappers.<AlbumConfig>lambdaQuery()
+                .eq(AlbumConfig::getPersonAlbumId, id));
+    }
 }

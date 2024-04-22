@@ -37,6 +37,7 @@ public enum ErrorCodeEnum implements CodeAndMsg {
     USER_NOT_PERMISSION(10022, "用户没有权限操作！"),
     TITLE_NOT_EMPTY(10023, "标题不能为空！"),
     CONTENT_NOT_EMPTY(10024, "内容不能为空！"),
+    USER_INFO_ERROR(10025, "获取用户信息失败！")
     ;
     private Integer code;
     private String msg;
