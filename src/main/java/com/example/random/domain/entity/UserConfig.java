@@ -50,6 +50,11 @@ public class UserConfig implements Serializable {
     private Date marryDate;
 
     /**
+     * 是否开启烟花秀
+     */
+    private Integer firework;
+
+    /**
      * 创建时间
      */
     private Date createDate;

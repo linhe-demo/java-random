@@ -32,9 +32,11 @@ public class CalendarUtil {
             backInfo.setLunarTerm(String.format("二十四节气：%s", s.getSolartermsMsg()));
         }
         if (!Strings.isEmpty(CalendarUtil.getLunarDay())) {
+            backInfo.setFirework(true);
             backInfo.setLunarFestival(String.format("农历节日：%s", CalendarUtil.getLunarDay()));
         }
         if (!Strings.isEmpty(gre.getGremessage())) {
+            backInfo.setFirework(true);
             backInfo.setLunarFestival(String.format("阳历节日：%s", gre.getGremessage()));
         }
         return backInfo;

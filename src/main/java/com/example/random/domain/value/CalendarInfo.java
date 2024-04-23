@@ -27,4 +27,9 @@ public class CalendarInfo {
      * 农历节日
      */
     private String lunarFestival;
+
+    /**
+     * 是否显示烟花秀
+     */
+    private Boolean firework;
 }

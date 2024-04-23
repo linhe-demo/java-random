@@ -3,19 +3,13 @@ package com.example.random.domain.repository.impl;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.random.domain.common.support.StatusEnum;
-import com.example.random.domain.entity.BabyLifeData;
-import com.example.random.domain.entity.ExtensionData;
-import com.example.random.domain.entity.UserBaby;
-import com.example.random.domain.entity.UserInfo;
+import com.example.random.domain.entity.*;
 import com.example.random.domain.repository.UserInfoRepository;
 import com.example.random.domain.utils.BeanCopierUtil;
 import com.example.random.domain.utils.MD5Util;
 import com.example.random.domain.utils.ToolsUtil;
 import com.example.random.interfaces.controller.put.request.user.RegisterRequest;
-import com.example.random.interfaces.mapper.BabyLifeDataMapper;
-import com.example.random.interfaces.mapper.ExtensionDataMapper;
-import com.example.random.interfaces.mapper.UserBabyMapper;
-import com.example.random.interfaces.mapper.UserInfoMapper;
+import com.example.random.interfaces.mapper.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -29,6 +23,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
     private final UserBabyMapper userBabyMapper;
     private final ExtensionDataMapper extensionDataMapper;
     private final BabyLifeDataMapper babyLifeDataMapper;
+    private final UserConfigMapper userConfigMapper;
 
 
     @Override
@@ -98,5 +93,11 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
         return babyLifeDataMapper.selectList(Wrappers.<BabyLifeData>lambdaQuery()
                 .eq(BabyLifeData::getPersonAlbumId, personAlbumId)
                 .orderByDesc(BabyLifeData::getDate));
+    }
+
+    @Override
+    public UserConfig getUserConfigByAlbumId(Long personAlbumId) {
+        return userConfigMapper.selectOne(Wrappers.<UserConfig>lambdaQuery()
+                .eq(UserConfig::getPersonAlbumId, personAlbumId));
     }
 }

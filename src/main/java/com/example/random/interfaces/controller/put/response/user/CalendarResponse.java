@@ -43,5 +43,9 @@ public class CalendarResponse {
      */
     private String certificateDay;
 
+    /**
+     * 是否展示烟花秀
+     */
+    private Boolean firework;
 
 }

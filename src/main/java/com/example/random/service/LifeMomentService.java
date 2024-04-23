@@ -2,6 +2,7 @@ package com.example.random.service;
 
 import com.example.random.domain.common.exception.NewException;
 import com.example.random.domain.common.support.ErrorCodeEnum;
+import com.example.random.domain.common.support.StatusEnum;
 import com.example.random.domain.constant.CommonEnum;
 import com.example.random.domain.entity.*;
 import com.example.random.domain.repository.AlbumConfigRepository;
@@ -36,7 +37,6 @@ import com.example.random.interfaces.mq.message.UploadImgMessage;
 import com.example.random.interfaces.redis.message.UploadMessage;
 import com.example.random.interfaces.redis.producer.RedisQueue;
 import lombok.RequiredArgsConstructor;
-import net.sf.jsqlparser.expression.StringValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -424,15 +424,16 @@ public class LifeMomentService {
 
     public CalendarResponse getDate() {
         UserInfo user = TokenUtil.getCurrentUser();
-        assert user != null;
         CalendarInfo dateInfo = CalendarUtil.getCurrentDate();
         CalendarResponse backInfo = new CalendarResponse();
         BeanCopierUtil.copy(dateInfo, backInfo);
-
-        if (user.getId() == 1 || user.getId() == 2) {
+        // 获取用户配置信息
+        UserConfig userConfig = userInfoRepository.getUserConfigByAlbumId(user.getPersonAlbumId());
+        if (!ObjectUtils.isEmpty(userConfig)) {
             backInfo.setMarryDay(CalendarUtil.getTimeApart("结婚：", "2023-11-28"));
             backInfo.setFirstMeeting(CalendarUtil.getTimeApart("初见：", "2022-01-30"));
             backInfo.setCertificateDay(CalendarUtil.getTimeApart("领证：", "2023-04-04"));
+            backInfo.setFirework(Objects.equals(userConfig.getFirework(), StatusEnum.FIREWORK_ON.getCode()));
         }
         return backInfo;
     }

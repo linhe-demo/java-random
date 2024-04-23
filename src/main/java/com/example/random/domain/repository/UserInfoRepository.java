@@ -67,4 +67,11 @@ public interface UserInfoRepository {
      * @return List<BabyLifeData>
      */
     List<BabyLifeData> getBabyLifeInfo(Long personAlbumId);
+
+    /**
+     * 获取用户配置
+     * @param personAlbumId Long
+     * @return  UserConfig
+     */
+    UserConfig getUserConfigByAlbumId(Long personAlbumId);
 }
