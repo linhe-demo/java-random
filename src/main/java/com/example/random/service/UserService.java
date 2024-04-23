@@ -224,13 +224,13 @@ public class UserService {
 
     public BabyHighlightResponse babyHighlight(String id) {
         BabyHighlightResponse backInfo = new BabyHighlightResponse();
-        List<LifeConfig> data = lifeConfigRepository.getLifeConfigData("baby-"+id);
+        List<LifeConfig> data = lifeConfigRepository.getLifeConfigData("baby-" + id);
         if (CollectionUtils.isEmpty(data)) {
             return backInfo;
         }
         List<String> list = new ArrayList<>();
         List<BabyLifeImg> dataList = new ArrayList<>();
-        data.forEach(i ->{
+        data.forEach(i -> {
             String url = CommonEnum.IMAGE_FILE_PATH.getValue() + i.getImgUrl();
             BabyLifeImg tmp = new BabyLifeImg();
             tmp.setUrl(url);
@@ -242,6 +242,10 @@ public class UserService {
         return backInfo;
     }
 
+    /**
+     * 获取用户随机六张岁月照片
+     * @return List<UserImageResponse>
+     */
     public List<UserImageResponse> imageList() {
         List<UserImageResponse> backInfo = new ArrayList<>();
         UserInfo user = TokenUtil.getCurrentUser();
@@ -249,10 +253,20 @@ public class UserService {
         if (!CollectionUtils.isEmpty(configList)) {
             List<Integer> lifeConfigId = configList.stream().map(AlbumConfig::getId).collect(Collectors.toList());
             List<LifeConfig> lifeConfigs = lifeConfigRepository.getRandomByIds(lifeConfigId);
-            int count = Math.min(lifeConfigs.size(), 6);
-            Collections.shuffle(lifeConfigs);
-            List<LifeConfig> lifeConfigsNew = lifeConfigs.subList(0, count);
-            backInfo = lifeConfigsNew.stream().map(i -> new UserImageResponse(String.format("%s%s",  CommonEnum.IMAGE_FILE_PATH.getValue(),  i.getImgUrl()), true)).collect(Collectors.toList());
+            Random rand = new Random();
+            Map<Integer, Integer> randomMap = new HashMap<>();
+            List<LifeConfig> newLifeConfigs = new ArrayList<>();
+            while (true) {
+                int randomNum = rand.nextInt(lifeConfigs.size());
+                if (!randomMap.containsKey(randomNum)) {
+                    randomMap.put(randomNum, randomNum);
+                    newLifeConfigs.add(lifeConfigs.get(randomNum));
+                    if (Objects.equals(newLifeConfigs.size(), StatusEnum.IMAGE_NUM.getCode())) {
+                        break;
+                    }
+                }
+            }
+            backInfo = newLifeConfigs.stream().map(i -> new UserImageResponse(String.format("%s%s", CommonEnum.IMAGE_FILE_PATH.getValue(), i.getImgUrl()), true)).collect(Collectors.toList());
         }
         return backInfo;
     }

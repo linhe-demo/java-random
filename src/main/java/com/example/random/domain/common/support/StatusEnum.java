@@ -21,7 +21,9 @@ public enum StatusEnum implements CodeAndMsg {
     BABY_ON(1, "出生"),
     BABY_OFF(2, "未出生"),
     MALE(1, "爸爸"),
-    FEMALE(2, "妈妈");
+    FEMALE(2, "妈妈"),
+    IMAGE_NUM(6, "主页个人岁月照片展示数量");
+
 
     private Integer code;
     private String msg;
