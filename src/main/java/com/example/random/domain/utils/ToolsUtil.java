@@ -116,6 +116,9 @@ public class ToolsUtil {
         if (Objects.equals(type, "seconds")) {
             model = "yyyy-MM-dd HH:mm:ss";
         }
+        if (Objects.equals(type, "anniversary")) {
+            model = "MM-dd";
+        }
         SimpleDateFormat formatter = new SimpleDateFormat(model);
         return formatter.format(date);
     }

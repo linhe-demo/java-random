@@ -48,4 +48,9 @@ public class CalendarResponse {
      */
     private Boolean firework;
 
+    /**
+     * 周年纪念
+     */
+    private String anniversary;
+
 }

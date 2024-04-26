@@ -430,10 +430,28 @@ public class LifeMomentService {
         // 获取用户配置信息
         UserConfig userConfig = userInfoRepository.getUserConfigByAlbumId(user.getPersonAlbumId());
         if (!ObjectUtils.isEmpty(userConfig)) {
-            backInfo.setMarryDay(CalendarUtil.getTimeApart("结婚：", "2023-11-28"));
-            backInfo.setFirstMeeting(CalendarUtil.getTimeApart("初见：", "2022-01-30"));
-            backInfo.setCertificateDay(CalendarUtil.getTimeApart("领证：", "2023-04-04"));
+            backInfo.setMarryDay(CalendarUtil.getTimeApart("结婚：", ToolsUtil.DateToString(userConfig.getMarryDate(), "day")));
+            backInfo.setFirstMeeting(CalendarUtil.getTimeApart("初见：", ToolsUtil.DateToString(userConfig.getFirstMeetDate(), "day")));
+            backInfo.setCertificateDay(CalendarUtil.getTimeApart("领证：", ToolsUtil.DateToString(userConfig.getCertificateDate(), "day")));
             backInfo.setFirework(Objects.equals(userConfig.getFirework(), StatusEnum.FIREWORK_ON.getCode()));
+            Date current = new Date();
+            String currentDate = ToolsUtil.DateToString(current, "anniversary");
+
+            if (user.getId() == 2) {
+                backInfo.setAnniversary("不能吃油炸食物");
+            }
+            if (Objects.equals(currentDate, ToolsUtil.DateToString(userConfig.getMarryDate(), "anniversary"))) {
+                backInfo.setFirework(true);
+                backInfo.setAnniversary("结婚周年纪念日");
+            }
+            if (Objects.equals(currentDate, ToolsUtil.DateToString(userConfig.getFirstMeetDate(), "anniversary"))) {
+                backInfo.setFirework(true);
+                backInfo.setAnniversary("初见周年纪念日");
+            }
+            if (Objects.equals(currentDate, ToolsUtil.DateToString(userConfig.getCertificateDate(), "anniversary"))) {
+                backInfo.setFirework(true);
+                backInfo.setAnniversary("领证周年纪念日");
+            }
         }
         return backInfo;
     }
