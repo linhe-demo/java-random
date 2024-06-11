@@ -101,7 +101,7 @@ public class LifeMomentService {
         } else {
             data.forEach(i -> {
                 LifeResponse info = new LifeResponse();
-                info.setImgUrl(CommonEnum.IMAGE_FILE_PATH.getValue() + i.getImgUrl());
+                info.setImgUrl(CommonEnum.IMAGE_FILE_PATH.getMsg() + i.getImgUrl());
                 info.setText(i.getText());
                 info.setId(i.getId());
                 list.add(info);
@@ -124,7 +124,7 @@ public class LifeMomentService {
         data.forEach(i -> {
             ConfigResponse tmpData = new ConfigResponse();
             BeanCopierUtil.copy(i, tmpData);
-            tmpData.setImgUrl(CommonEnum.IMAGE_FILE_PATH.getValue() + i.getImgUrl());
+            tmpData.setImgUrl(CommonEnum.IMAGE_FILE_PATH.getMsg() + i.getImgUrl());
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             tmpData.setCreateTime(dateFormat.format(i.getCreateTime()));
             if (i.getUpdateTime() != null) {
@@ -346,7 +346,7 @@ public class LifeMomentService {
 
             // 创建请求
             Request request = new Request.Builder()
-                    .url(CommonEnum.IMAGE_HANDLE_URL.getValue())
+                    .url(CommonEnum.IMAGE_HANDLE_URL.getMsg())
                     .post(requestBody)
                     .build();
 

@@ -27,17 +27,19 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
 
 
     @Override
-    @DS("composer")
+    @DS("user")
     public UserInfo findByUserName(String userName) {
         return userInfoMapper.selectOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserName, userName));
     }
 
     @Override
+    @DS("user")
     public UserInfo getById(Integer uid) {
         return userInfoMapper.selectOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getId, uid));
     }
 
     @Override
+    @DS("user")
     public Long saveUserInfo(RegisterRequest request) {
         UserInfo user = new UserInfo();
         user.setUserName(request.getUserName());
@@ -52,6 +54,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
     }
 
     @Override
+    @DS("user")
     public void updateUserById(UserInfo oldUser) {
         UserInfo newUser = new UserInfo();
         BeanCopierUtil.copy(oldUser, newUser);
@@ -60,6 +63,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
     }
 
     @Override
+    @DS("user")
     public List<UserBaby> getBabyConfigById(long id) {
         return userBabyMapper.selectList(Wrappers.<UserBaby>lambdaQuery()
                 .eq(UserBaby::getPersonAlbumId, id)
@@ -96,6 +100,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository {
     }
 
     @Override
+    @DS("user")
     public UserConfig getUserConfigByAlbumId(Long personAlbumId) {
         return userConfigMapper.selectOne(Wrappers.<UserConfig>lambdaQuery()
                 .eq(UserConfig::getPersonAlbumId, personAlbumId));

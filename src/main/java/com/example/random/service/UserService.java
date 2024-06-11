@@ -231,7 +231,7 @@ public class UserService {
         List<String> list = new ArrayList<>();
         List<BabyLifeImg> dataList = new ArrayList<>();
         data.forEach(i -> {
-            String url = CommonEnum.IMAGE_FILE_PATH.getValue() + i.getImgUrl();
+            String url = CommonEnum.IMAGE_FILE_PATH.getMsg() + i.getImgUrl();
             BabyLifeImg tmp = new BabyLifeImg();
             tmp.setUrl(url);
             dataList.add(tmp);
@@ -266,7 +266,7 @@ public class UserService {
                     }
                 }
             }
-            backInfo = newLifeConfigs.stream().map(i -> new UserImageResponse(String.format("%s%s", CommonEnum.IMAGE_FILE_PATH.getValue(), i.getImgUrl()), true)).collect(Collectors.toList());
+            backInfo = newLifeConfigs.stream().map(i -> new UserImageResponse(String.format("%s%s", CommonEnum.IMAGE_FILE_PATH.getMsg(), i.getImgUrl()), true)).collect(Collectors.toList());
         }
         return backInfo;
     }
