@@ -22,9 +22,9 @@ public class QiNiuUtil {
 
         UploadManager uploadManager = new UploadManager(cfg);
 
-        String accessKey = CommonEnum.QI_NIU_ACCESS_KEY.getMsg();
-        String secretKey = CommonEnum.QI_NIU_SECRET_kEY.getMsg();
-        String bucket = CommonEnum.QI_NIU_BUCKET.getMsg();
+        String accessKey = CommonEnum.Yun.QI_NIU_ACCESS_KEY.getData();
+        String secretKey = CommonEnum.Yun.QI_NIU_SECRET_kEY.getData();
+        String bucket = CommonEnum.Yun.QI_NIU_BUCKET.getData();
         //默认不指定key的情况下，以文件内容的hash值作为文件名
         Auth auth = Auth.create(accessKey, secretKey);
         String upToken = auth.uploadToken(bucket);

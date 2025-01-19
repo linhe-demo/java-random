@@ -69,7 +69,7 @@ public class UserService {
                     double newNumber = bd.doubleValue();
                     backInfo.setPercentage((int) (newNumber * 100));
                 }
-                if (!Objects.isNull(item.getPregnancyDate())) {
+                if (!Objects.isNull(item.getPregnancyDate()) && Objects.equals(item.getStatus(), StatusEnum.BABY_OFF.getCode())) {
                     PregnantDate info = PregnancyCalculator(item.getPregnancyDate());
                     if (info.getDay() > 0) {
                         backInfo.setPregnantWeeks(String.format("孕期：孕%s周%s天", info.getWeek(), info.getDay()));
@@ -231,7 +231,7 @@ public class UserService {
         List<String> list = new ArrayList<>();
         List<BabyLifeImg> dataList = new ArrayList<>();
         data.forEach(i -> {
-            String url = CommonEnum.IMAGE_FILE_PATH.getMsg() + i.getImgUrl();
+            String url = CommonEnum.Yun.IMAGE_FILE_PATH.getData() + i.getImgUrl();
             BabyLifeImg tmp = new BabyLifeImg();
             tmp.setUrl(url);
             dataList.add(tmp);
@@ -266,7 +266,7 @@ public class UserService {
                     }
                 }
             }
-            backInfo = newLifeConfigs.stream().map(i -> new UserImageResponse(String.format("%s%s", CommonEnum.IMAGE_FILE_PATH.getMsg(), i.getImgUrl()), true)).collect(Collectors.toList());
+            backInfo = newLifeConfigs.stream().map(i -> new UserImageResponse(String.format("%s%s", CommonEnum.Yun.IMAGE_FILE_PATH.getData(), i.getImgUrl()), true)).collect(Collectors.toList());
         }
         return backInfo;
     }
