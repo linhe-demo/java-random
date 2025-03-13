@@ -44,3 +44,5 @@ stages/config
 /src/main/java/com/example/random/domain/constant/CommonEnum.java
 
 /src/main/java/com/example/random/interfaces/controller/Demo.java
+
+/src/main/java/com/example/random/domain/constant/enumerate/Yun.java

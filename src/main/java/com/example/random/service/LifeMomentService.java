@@ -3,7 +3,7 @@ package com.example.random.service;
 import com.example.random.domain.common.exception.NewException;
 import com.example.random.domain.common.support.ErrorCodeEnum;
 import com.example.random.domain.common.support.StatusEnum;
-import com.example.random.domain.constant.CommonEnum;
+import com.example.random.domain.constant.enumerate.Yun;
 import com.example.random.domain.entity.*;
 import com.example.random.domain.repository.AlbumConfigRepository;
 import com.example.random.domain.repository.DateListRepository;
@@ -101,7 +101,7 @@ public class LifeMomentService {
         } else {
             data.forEach(i -> {
                 LifeResponse info = new LifeResponse();
-                info.setImgUrl(CommonEnum.Yun.IMAGE_FILE_PATH.getData() + i.getImgUrl());
+                info.setImgUrl(Yun.IMAGE_FILE_PATH.getDesc() + i.getImgUrl());
                 info.setText(i.getText());
                 info.setId(i.getId());
                 list.add(info);
@@ -124,7 +124,7 @@ public class LifeMomentService {
         data.forEach(i -> {
             ConfigResponse tmpData = new ConfigResponse();
             BeanCopierUtil.copy(i, tmpData);
-            tmpData.setImgUrl(CommonEnum.Yun.IMAGE_FILE_PATH.getData() + i.getImgUrl());
+            tmpData.setImgUrl(Yun.IMAGE_FILE_PATH.getDesc() + i.getImgUrl());
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             tmpData.setCreateTime(dateFormat.format(i.getCreateTime()));
             if (i.getUpdateTime() != null) {
@@ -346,7 +346,7 @@ public class LifeMomentService {
 
             // 创建请求
             Request request = new Request.Builder()
-                    .url(CommonEnum.Yun.IMAGE_HANDLE_URL.getData())
+                    .url(Yun.IMAGE_HANDLE_URL.getDesc())
                     .post(requestBody)
                     .build();
 

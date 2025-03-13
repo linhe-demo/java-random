@@ -3,7 +3,7 @@ package com.example.random.service;
 import com.example.random.domain.common.exception.NewException;
 import com.example.random.domain.common.support.ErrorCodeEnum;
 import com.example.random.domain.common.support.StatusEnum;
-import com.example.random.domain.constant.CommonEnum;
+import com.example.random.domain.constant.enumerate.Yun;
 import com.example.random.domain.entity.*;
 import com.example.random.domain.repository.AlbumConfigRepository;
 import com.example.random.domain.repository.LifeConfigRepository;
@@ -231,7 +231,7 @@ public class UserService {
         List<String> list = new ArrayList<>();
         List<BabyLifeImg> dataList = new ArrayList<>();
         data.forEach(i -> {
-            String url = CommonEnum.Yun.IMAGE_FILE_PATH.getData() + i.getImgUrl();
+            String url = Yun.IMAGE_FILE_PATH.getDesc() + i.getImgUrl();
             BabyLifeImg tmp = new BabyLifeImg();
             tmp.setUrl(url);
             dataList.add(tmp);
@@ -266,7 +266,7 @@ public class UserService {
                     }
                 }
             }
-            backInfo = newLifeConfigs.stream().map(i -> new UserImageResponse(String.format("%s%s", CommonEnum.Yun.IMAGE_FILE_PATH.getData(), i.getImgUrl()), true)).collect(Collectors.toList());
+            backInfo = newLifeConfigs.stream().map(i -> new UserImageResponse(String.format("%s%s", Yun.IMAGE_FILE_PATH.getDesc(), i.getImgUrl()), true)).collect(Collectors.toList());
         }
         return backInfo;
     }

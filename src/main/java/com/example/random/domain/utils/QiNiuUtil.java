@@ -2,7 +2,7 @@ package com.example.random.domain.utils;
 
 import com.example.random.domain.common.exception.NewException;
 import com.example.random.domain.common.support.ErrorCodeEnum;
-import com.example.random.domain.constant.CommonEnum;
+import com.example.random.domain.constant.enumerate.Yun;
 import com.example.random.interfaces.client.vo.response.QiNiuResponse;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
@@ -22,9 +22,9 @@ public class QiNiuUtil {
 
         UploadManager uploadManager = new UploadManager(cfg);
 
-        String accessKey = CommonEnum.Yun.QI_NIU_ACCESS_KEY.getData();
-        String secretKey = CommonEnum.Yun.QI_NIU_SECRET_kEY.getData();
-        String bucket = CommonEnum.Yun.QI_NIU_BUCKET.getData();
+        String accessKey = Yun.QI_NIU_ACCESS_KEY.getDesc();
+        String secretKey = Yun.QI_NIU_SECRET_kEY.getDesc();
+        String bucket = Yun.QI_NIU_BUCKET.getDesc();
         //默认不指定key的情况下，以文件内容的hash值作为文件名
         Auth auth = Auth.create(accessKey, secretKey);
         String upToken = auth.uploadToken(bucket);
